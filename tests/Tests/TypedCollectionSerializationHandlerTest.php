@@ -13,6 +13,7 @@ use JMS\Serializer\Exception\UnsupportedFormatException;
 use JMS\Serializer\Handler\HandlerRegistry;
 use JMS\Serializer\Serializer;
 use JMS\Serializer\SerializerBuilder;
+use Jojo1981\JmsSerializerHandlers\Exception\SerializationHandlerException;
 use Jojo1981\JmsSerializerHandlers\TypedCollectionSerializationHandler;
 use Jojo1981\TypedCollection\Collection;
 use Jojo1981\TypedCollection\Exception\CollectionException;
@@ -68,6 +69,52 @@ class TypedCollectionSerializationHandlerTest extends TestCase
         ];
 
         $this->assertEquals($expectedResult, TypedCollectionSerializationHandler::getSubscribingMethods());
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function invalidConfigurationMissingParametersShouldThrowAnSerializationHandlerException(): void
+    {
+        $this->expectExceptionObject(new SerializationHandlerException(
+            'Invalid config for serialization type: `Jojo1981\TypedCollection\Collection` given. You MUST add a ' .
+            'parameter which contains the value of for the type of the collection. This value can be a primitive type,' .
+            ' fully qualified class name or fully qualified interface name'
+        ));
+
+        $this->serializer->deserialize('[]', Collection::class, 'json');
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function invalidConfigurationTypeParameterHasInvalidTypeValueShouldThrowAnSerializationHandlerException(): void
+    {
+        $this->expectExceptionObject(new SerializationHandlerException(
+            'Invalid config for serialization type: `Jojo1981\TypedCollection\Collection` given. The type parameter ' .
+            'value: `invalidType` is not valid'
+        ));
+
+        $this->serializer->deserialize('[]', Collection::class . '<invalidType>', 'json');
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function invalidConfigurationTooManyParametersShouldThrowAnSerializationHandlerException(): void
+    {
+        $this->expectExceptionObject(new SerializationHandlerException(
+            'Invalid config for serialization type: `Jojo1981\TypedCollection\Collection` given. Too many parameters ' .
+            'given. This config expect 1 parameter, but got 3 number of parameters given'
+        ));
+
+        $this->serializer->deserialize('[]', Collection::class . '<string, arg2, arg3>', 'json');
     }
 
     /**

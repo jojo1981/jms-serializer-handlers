@@ -75,7 +75,7 @@ class TypedCollectionSerializationHandler implements SubscribingHandlerInterface
             throw new SerializationHandlerException(\sprintf(
                 'Invalid config for serialization type: `%s` given. You MUST add a parameter which contains the value' .
                 ' of for the type of the collection. This value can be a primitive type, fully qualified class name or' .
-                ' or fully qualified interface name',
+                ' fully qualified interface name',
                 Collection::class
             ));
         }
@@ -92,7 +92,7 @@ class TypedCollectionSerializationHandler implements SubscribingHandlerInterface
         if ($numberOfParameters > 1) {
             throw new SerializationHandlerException(\sprintf(
                 'Invalid config for serialization type: `%s` given. Too many parameters given. This config expect 1' .
-                ' parameter, but %d number of parameters given',
+                ' parameter, but got %d number of parameters given',
                 Collection::class,
                 $numberOfParameters
             ));
