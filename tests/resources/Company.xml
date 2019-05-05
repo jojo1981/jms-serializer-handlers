@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<serializer>
+    <class name="tests\Jojo1981\JmsSerializerHandlers\Fixtures\Company" access-type="property" exclusion-policy="ALL" xml-root-name="company">
+        <property name="name" xml-attribute="true" type="string" expose="true"/>
+        <property name="employees" expose="true">
+            <type><![CDATA[Jojo1981\TypedCollection\Collection<tests\Jojo1981\JmsSerializerHandlers\Fixtures\Employee>]]></type>
+            <xml-list inline="false" entry-name="employee" skip-when-empty="true"/>
+        </property>
+    </class>
+</serializer>
