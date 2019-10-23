@@ -19,12 +19,12 @@
       "email": "jnijhuis81@gmail.com"
     }
   ],
-  "minimum-stability": "dev",
   "prefer-stable": true,
+  "minimum-stability": "dev",
   "require": {
     "php": "^7.1",
     "jms/serializer": "^1.14",
-    "jojo1981/typed-collection": "dev-master"
+    "jojo1981/typed-collection": "^1.0"
   },
   "require-dev": {
     "doctrine/cache": "^1.8",
