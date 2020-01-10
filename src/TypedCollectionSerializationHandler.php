@@ -14,8 +14,9 @@ use JMS\Serializer\GraphNavigator;
 use JMS\Serializer\Handler\SubscribingHandlerInterface;
 use JMS\Serializer\VisitorInterface;
 use Jojo1981\JmsSerializerHandlers\Exception\SerializationHandlerException;
+use Jojo1981\PhpTypes\AbstractType;
+use Jojo1981\PhpTypes\Exception\TypeException;
 use Jojo1981\TypedCollection\Collection;
-use Jojo1981\TypedCollection\Value\Type\AbstractTypeValue;
 
 /**
  * @package Jojo1981\JmsSerializerHandlers
@@ -80,12 +81,18 @@ class TypedCollectionSerializationHandler implements SubscribingHandlerInterface
             ));
         }
 
-        if (!AbstractTypeValue::isValidValue($collectionType)) {
-            throw new SerializationHandlerException(\sprintf(
-                'Invalid config for serialization type: `%s` given. The type parameter value: `%s` is not valid',
-                Collection::class,
-                $collectionType
-            ));
+        try {
+            AbstractType::createFromTypeName($collectionType);
+        } catch (TypeException $exception) {
+            throw new SerializationHandlerException(
+                \sprintf(
+                    'Invalid config for serialization type: `%s` given. The type parameter value: `%s` is not valid',
+                    Collection::class,
+                    $collectionType
+                ),
+                0,
+                $exception
+            );
         }
 
         $numberOfParameters = \count($type['params']);
