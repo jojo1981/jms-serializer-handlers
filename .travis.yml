@@ -1,15 +1,15 @@
 language: php
 
 php:
-  - '7.1'
   - '7.2'
   - '7.3'
+  - '7.4'
 
 before-install:
   - composer self-update
 
 install:
-  - composer install --dev
+  - composer install
 
 after_success:
   - travis_retry php ./bin/php-coveralls -v

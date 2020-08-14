@@ -10,13 +10,17 @@
 namespace Jojo1981\JmsSerializerHandlers;
 
 use JMS\Serializer\Context;
-use JMS\Serializer\GraphNavigator;
+use JMS\Serializer\GraphNavigatorInterface;
 use JMS\Serializer\Handler\SubscribingHandlerInterface;
-use JMS\Serializer\VisitorInterface;
+use JMS\Serializer\Visitor\DeserializationVisitorInterface;
+use JMS\Serializer\Visitor\SerializationVisitorInterface;
 use Jojo1981\JmsSerializerHandlers\Exception\SerializationHandlerException;
 use Jojo1981\PhpTypes\AbstractType;
 use Jojo1981\PhpTypes\Exception\TypeException;
 use Jojo1981\TypedCollection\Collection;
+use LogicException;
+use function count;
+use function sprintf;
 
 /**
  * @package Jojo1981\JmsSerializerHandlers
@@ -31,16 +35,16 @@ class TypedCollectionSerializationHandler implements SubscribingHandlerInterface
         $methods = [];
         foreach (['json', 'xml', 'yml'] as $format) {
             $methods[] = [
-                'direction' => GraphNavigator::DIRECTION_SERIALIZATION,
+                'direction' => GraphNavigatorInterface::DIRECTION_SERIALIZATION,
                 'format' => $format,
                 'type' => Collection::class,
-                'method' => 'serializeValue',
+                'method' => 'serializeCollection',
             ];
             $methods[] = [
-                'direction' => GraphNavigator::DIRECTION_DESERIALIZATION,
+                'direction' => GraphNavigatorInterface::DIRECTION_DESERIALIZATION,
                 'format' => $format,
                 'type' => Collection::class,
-                'method' => 'deserializeValue',
+                'method' => 'deserializeCollection',
             ];
         }
 
@@ -48,32 +52,37 @@ class TypedCollectionSerializationHandler implements SubscribingHandlerInterface
     }
 
     /**
-     * @param VisitorInterface $visitor
-     * @param Collection $typedCollection
+     * @param SerializationVisitorInterface $visitor
+     * @param Collection $collection
      * @param array $type
      * @param Context $context
      * @return null|array
      */
-    public function serializeValue(VisitorInterface $visitor, Collection $typedCollection, array $type, Context $context): ?array
+    public function serializeCollection(SerializationVisitorInterface $visitor, Collection $collection, array $type, Context $context): ?array
     {
         $type['name'] = 'array';
 
-        return $visitor->visitArray($typedCollection->toArray(), $type, $context);
+        $context->stopVisiting($collection);
+        $result = $visitor->visitArray($collection->toArray(), $type);
+
+        $context->startVisiting($collection);
+
+        return $result;
     }
 
     /**
-     * @param VisitorInterface $visitor
+     * @param DeserializationVisitorInterface $visitor
      * @param mixed $data
      * @param array $type
      * @param Context $context
-     * @throws \LogicException
      * @return Collection
+     * @throws LogicException
      */
-    public function deserializeValue(VisitorInterface $visitor, $data, array $type, Context $context): Collection
+    public function deserializeCollection(DeserializationVisitorInterface $visitor, $data, array $type, Context $context): Collection
     {
         $collectionType = $type['params'][0]['name'] ?? null;
         if (empty($collectionType)) {
-            throw new SerializationHandlerException(\sprintf(
+            throw new SerializationHandlerException(sprintf(
                 'Invalid config for serialization type: `%s` given. You MUST add a parameter which contains the value' .
                 ' of for the type of the collection. This value can be a primitive type, fully qualified class name or' .
                 ' fully qualified interface name',
@@ -85,7 +94,7 @@ class TypedCollectionSerializationHandler implements SubscribingHandlerInterface
             AbstractType::createFromTypeName($collectionType);
         } catch (TypeException $exception) {
             throw new SerializationHandlerException(
-                \sprintf(
+                sprintf(
                     'Invalid config for serialization type: `%s` given. The type parameter value: `%s` is not valid',
                     Collection::class,
                     $collectionType
@@ -95,9 +104,9 @@ class TypedCollectionSerializationHandler implements SubscribingHandlerInterface
             );
         }
 
-        $numberOfParameters = \count($type['params']);
+        $numberOfParameters = count($type['params']);
         if ($numberOfParameters > 1) {
-            throw new SerializationHandlerException(\sprintf(
+            throw new SerializationHandlerException(sprintf(
                 'Invalid config for serialization type: `%s` given. Too many parameters given. This config expect 1' .
                 ' parameter, but got %d number of parameters given',
                 Collection::class,
@@ -107,6 +116,6 @@ class TypedCollectionSerializationHandler implements SubscribingHandlerInterface
 
         $type['name'] = 'array';
 
-        return new Collection($collectionType, $visitor->visitArray($data, $type, $context));
+        return new Collection($collectionType, $visitor->visitArray($data, $type));
     }
 }

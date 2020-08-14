@@ -9,6 +9,8 @@
  */
 namespace tests\Jojo1981\JmsSerializerHandlers\Tests;
 
+use JMS\Serializer\Exception\InvalidArgumentException as JmsInvalidArgumentException;
+use JMS\Serializer\Exception\RuntimeException as JmsRuntimeException;
 use JMS\Serializer\Exception\UnsupportedFormatException;
 use JMS\Serializer\Handler\HandlerRegistry;
 use JMS\Serializer\Serializer;
@@ -33,7 +35,8 @@ class TypedCollectionSerializationHandlerTest extends TestCase
 
     /**
      * @return void
-     * @throws \JMS\Serializer\Exception\InvalidArgumentException
+     * @throws JmsRuntimeException
+     * @throws JmsInvalidArgumentException
      */
     protected function setUp(): void
     {
@@ -60,15 +63,15 @@ class TypedCollectionSerializationHandlerTest extends TestCase
     public function getSubscribingMethodsShouldReturnTheRightSubscribingConfiguration(): void
     {
         $expectedResult = [
-            ['direction' => 1, 'format' => 'json', 'type' => Collection::class, 'method' => 'serializeValue'],
-            ['direction' => 2, 'format' => 'json', 'type' => Collection::class, 'method' => 'deserializeValue'],
-            ['direction' => 1, 'format' => 'xml', 'type' => Collection::class, 'method' => 'serializeValue'],
-            ['direction' => 2, 'format' => 'xml', 'type' => Collection::class, 'method' => 'deserializeValue'],
-            ['direction' => 1, 'format' => 'yml', 'type' => Collection::class, 'method' => 'serializeValue'],
-            ['direction' => 2, 'format' => 'yml', 'type' => Collection::class, 'method' => 'deserializeValue'],
+            ['direction' => 1, 'format' => 'json', 'type' => Collection::class, 'method' => 'serializeCollection'],
+            ['direction' => 2, 'format' => 'json', 'type' => Collection::class, 'method' => 'deserializeCollection'],
+            ['direction' => 1, 'format' => 'xml', 'type' => Collection::class, 'method' => 'serializeCollection'],
+            ['direction' => 2, 'format' => 'xml', 'type' => Collection::class, 'method' => 'deserializeCollection'],
+            ['direction' => 1, 'format' => 'yml', 'type' => Collection::class, 'method' => 'serializeCollection'],
+            ['direction' => 2, 'format' => 'yml', 'type' => Collection::class, 'method' => 'deserializeCollection'],
         ];
 
-        $this->assertEquals($expectedResult, TypedCollectionSerializationHandler::getSubscribingMethods());
+        self::assertEquals($expectedResult, TypedCollectionSerializationHandler::getSubscribingMethods());
     }
 
     /**
@@ -120,17 +123,18 @@ class TypedCollectionSerializationHandlerTest extends TestCase
     /**
      * @test
      *
+     * @return void
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
+     * @throws JmsRuntimeException
      * @throws CollectionException
-     * @return void
      */
     public function toArrayShouldConvertTheCompanyObjectIntoAnArray(): void
     {
         $companyObject = $this->getCompanyObject();
         $companyArray = $this->getCompanyArray();
 
-        $this->assertEquals($companyArray, $this->serializer->toArray($companyObject));
+        self::assertEquals($companyArray, $this->serializer->toArray($companyObject));
     }
 
     /**
@@ -146,7 +150,7 @@ class TypedCollectionSerializationHandlerTest extends TestCase
         $companyObject = $this->getCompanyObject();
         $companyArray = $this->getCompanyArray();
 
-        $this->assertEquals($companyObject, $this->serializer->fromArray($companyArray, Company::class));
+        self::assertEquals($companyObject, $this->serializer->fromArray($companyArray, Company::class));
     }
 
     /**
@@ -162,7 +166,7 @@ class TypedCollectionSerializationHandlerTest extends TestCase
         $companyObject = $this->getCompanyObject();
         $jsonString = $this->getJsonString();
 
-        $this->assertEquals($companyObject, $this->serializer->deserialize($jsonString, Company::class, 'json'));
+        self::assertEquals($companyObject, $this->serializer->deserialize($jsonString, Company::class, 'json'));
     }
 
     /**
@@ -178,7 +182,7 @@ class TypedCollectionSerializationHandlerTest extends TestCase
         $companyObject = $this->getCompanyObject();
         $jsonString = $this->getJsonString();
 
-        $this->assertEquals($jsonString, $this->serializer->serialize($companyObject, 'json'));
+        self::assertEquals($jsonString, $this->serializer->serialize($companyObject, 'json'));
     }
 
     /**
@@ -194,7 +198,7 @@ class TypedCollectionSerializationHandlerTest extends TestCase
         $companyObject = $this->getCompanyObject();
         $xmlString = $this->getXmlString();
 
-        $this->assertEquals($companyObject, $this->serializer->deserialize($xmlString, Company::class, 'xml'));
+        self::assertEquals($companyObject, $this->serializer->deserialize($xmlString, Company::class, 'xml'));
     }
 
     /**
@@ -210,7 +214,7 @@ class TypedCollectionSerializationHandlerTest extends TestCase
         $companyObject = $this->getCompanyObject();
         $xmlString = $this->getXmlString();
 
-        $this->assertEquals($xmlString, $this->serializer->serialize($companyObject, 'xml'));
+        self::assertEquals($xmlString, $this->serializer->serialize($companyObject, 'xml'));
     }
 
     /**
@@ -230,17 +234,17 @@ class TypedCollectionSerializationHandlerTest extends TestCase
     /**
      * @test
      *
-     * @throws ExpectationFailedException
-     * @throws InvalidArgumentException
-     * @throws CollectionException
      * @return void
+     * @throws CollectionException
      */
     public function serializeShouldConvertACompanyObjectIntoAYamlString(): void
     {
-        $companyObject = $this->getCompanyObject();
-        $yamlString = $this->getYamlString();
+        $this->expectExceptionObject(
+            new UnsupportedFormatException('The format "yml" is not supported for serialization.')
+        );
 
-        $this->assertEquals($yamlString, $this->serializer->serialize($companyObject, 'yml'));
+        $companyObject = $this->getCompanyObject();
+        $this->serializer->serialize($companyObject, 'yml');
     }
 
     /**
