@@ -2,7 +2,7 @@
 /*
  * This file is part of the jojo1981/jms-serializer-handlers package
  *
- * Copyright (c) 2019 Joost Nijhuis <jnijhuis81@gmail.com>
+ * Copyright (c) 2021 Joost Nijhuis <jnijhuis81@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed in the root of the source code
@@ -20,19 +20,20 @@ use JMS\Serializer\Handler\HandlerRegistry;
 use JMS\Serializer\Serializer;
 use JMS\Serializer\SerializerBuilder;
 use Jojo1981\JmsSerializerHandlers\Exception\SerializationHandlerException;
-use Jojo1981\JmsSerializerHandlers\TypedCollectionSerializationHandler;
-use Jojo1981\TypedCollection\Collection;
-use Jojo1981\TypedCollection\Exception\CollectionException;
+use Jojo1981\JmsSerializerHandlers\TypedSetSerializationHandler;
+use Jojo1981\TypedSet\Exception\SetException;
+use Jojo1981\TypedSet\Handler\Exception\HandlerException;
+use Jojo1981\TypedSet\Set;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use SebastianBergmann\RecursionContext\InvalidArgumentException as SebastianBergmannInvalidArgumentException;
-use tests\Jojo1981\JmsSerializerHandlers\Fixtures\Collection\Company;
-use tests\Jojo1981\JmsSerializerHandlers\Fixtures\Collection\Employee;
+use tests\Jojo1981\JmsSerializerHandlers\Fixtures\Set\Company;
+use tests\Jojo1981\JmsSerializerHandlers\Fixtures\Set\Employee;
 
 /**
  * @package tests\Jojo1981\JmsSerializerHandlers\Tests
  */
-class TypedCollectionSerializationHandlerTest extends TestCase
+class TypedSetSerializationHandlerTest extends TestCase
 {
     /** @var Serializer|null */
     private ?Serializer $serializer = null;
@@ -55,7 +56,7 @@ class TypedCollectionSerializationHandlerTest extends TestCase
             ])
             ->addDefaultHandlers()
             ->configureHandlers(static function (HandlerRegistry $handlerRegistry): void {
-                $handlerRegistry->registerSubscribingHandler(new TypedCollectionSerializationHandler());
+                $handlerRegistry->registerSubscribingHandler(new TypedSetSerializationHandler());
             })
             ->build();
     }
@@ -70,15 +71,15 @@ class TypedCollectionSerializationHandlerTest extends TestCase
     public function getSubscribingMethodsShouldReturnTheRightSubscribingConfiguration(): void
     {
         $expectedResult = [
-            ['direction' => 1, 'format' => 'json', 'type' => Collection::class, 'method' => 'serializeCollection'],
-            ['direction' => 2, 'format' => 'json', 'type' => Collection::class, 'method' => 'deserializeCollection'],
-            ['direction' => 1, 'format' => 'xml', 'type' => Collection::class, 'method' => 'serializeCollection'],
-            ['direction' => 2, 'format' => 'xml', 'type' => Collection::class, 'method' => 'deserializeCollection'],
-            ['direction' => 1, 'format' => 'yml', 'type' => Collection::class, 'method' => 'serializeCollection'],
-            ['direction' => 2, 'format' => 'yml', 'type' => Collection::class, 'method' => 'deserializeCollection'],
+            ['direction' => 1, 'format' => 'json', 'type' => Set::class, 'method' => 'serializeSet'],
+            ['direction' => 2, 'format' => 'json', 'type' => Set::class, 'method' => 'deserializeSet'],
+            ['direction' => 1, 'format' => 'xml', 'type' => Set::class, 'method' => 'serializeSet'],
+            ['direction' => 2, 'format' => 'xml', 'type' => Set::class, 'method' => 'deserializeSet'],
+            ['direction' => 1, 'format' => 'yml', 'type' => Set::class, 'method' => 'serializeSet'],
+            ['direction' => 2, 'format' => 'yml', 'type' => Set::class, 'method' => 'deserializeSet'],
         ];
 
-        self::assertEquals($expectedResult, TypedCollectionSerializationHandler::getSubscribingMethods());
+        self::assertEquals($expectedResult, TypedSetSerializationHandler::getSubscribingMethods());
     }
 
     /**
@@ -93,12 +94,12 @@ class TypedCollectionSerializationHandlerTest extends TestCase
     public function invalidConfigurationMissingParametersShouldThrowAnSerializationHandlerException(): void
     {
         $this->expectExceptionObject(new SerializationHandlerException(
-            'Invalid config for serialization type: `Jojo1981\TypedCollection\Collection` given. You MUST add a ' .
+            'Invalid config for serialization type: `Jojo1981\TypedSet\Set` given. You MUST add a ' .
             'parameter which contains the value of for the type of the collection. This value can be a primitive type,' .
             ' fully qualified class name or fully qualified interface name'
         ));
 
-        $this->serializer->deserialize('[]', Collection::class, 'json');
+        $this->serializer->deserialize('[]', Set::class, 'json');
     }
 
     /**
@@ -113,11 +114,11 @@ class TypedCollectionSerializationHandlerTest extends TestCase
     public function invalidConfigurationTypeParameterHasInvalidTypeValueShouldThrowAnSerializationHandlerException(): void
     {
         $this->expectExceptionObject(new SerializationHandlerException(
-            'Invalid config for serialization type: `Jojo1981\TypedCollection\Collection` given. The type parameter ' .
+            'Invalid config for serialization type: `Jojo1981\TypedSet\Set` given. The type parameter ' .
             'value: `invalidType` is not valid'
         ));
 
-        $this->serializer->deserialize('[]', Collection::class . '<invalidType>', 'json');
+        $this->serializer->deserialize('[]', Set::class . '<invalidType>', 'json');
     }
 
     /**
@@ -132,24 +133,25 @@ class TypedCollectionSerializationHandlerTest extends TestCase
     public function invalidConfigurationTooManyParametersShouldThrowAnSerializationHandlerException(): void
     {
         $this->expectExceptionObject(new SerializationHandlerException(
-            'Invalid config for serialization type: `Jojo1981\TypedCollection\Collection` given. Too many parameters ' .
+            'Invalid config for serialization type: `Jojo1981\TypedSet\Set` given. Too many parameters ' .
             'given. This config expect 1 parameter, but got 3 number of parameters given'
         ));
 
-        $this->serializer->deserialize('[]', Collection::class . '<string, arg2, arg3>', 'json');
+        $this->serializer->deserialize('[]', Set::class . '<string, arg2, arg3>', 'json');
     }
 
     /**
      * @test
      *
      * @return void
-     * @throws ExpectationFailedException
+     * @throws HandlerException
      * @throws JmsLogicException
      * @throws JmsRuntimeException
      * @throws NotAcceptableException
      * @throws SebastianBergmannInvalidArgumentException
+     * @throws SetException
      * @throws UnsupportedFormatException
-     * @throws CollectionException
+     * @throws ExpectationFailedException
      */
     public function toArrayShouldConvertTheCompanyObjectIntoAnArray(): void
     {
@@ -163,13 +165,14 @@ class TypedCollectionSerializationHandlerTest extends TestCase
      * @test
      *
      * @return void
-     * @throws ExpectationFailedException
+     * @throws HandlerException
      * @throws JmsLogicException
      * @throws JmsRuntimeException
      * @throws NotAcceptableException
      * @throws SebastianBergmannInvalidArgumentException
+     * @throws SetException
      * @throws UnsupportedFormatException
-     * @throws CollectionException
+     * @throws ExpectationFailedException
      */
     public function fromArrayShouldConvertAnArrayIntoACompanyObject(): void
     {
@@ -183,13 +186,14 @@ class TypedCollectionSerializationHandlerTest extends TestCase
      * @test
      *
      * @return void
-     * @throws ExpectationFailedException
+     * @throws HandlerException
      * @throws JmsLogicException
      * @throws JmsRuntimeException
      * @throws NotAcceptableException
      * @throws SebastianBergmannInvalidArgumentException
+     * @throws SetException
      * @throws UnsupportedFormatException
-     * @throws CollectionException
+     * @throws ExpectationFailedException
      */
     public function deserializeShouldConvertJsonStringIntoACompanyObject(): void
     {
@@ -203,13 +207,14 @@ class TypedCollectionSerializationHandlerTest extends TestCase
      * @test
      *
      * @return void
-     * @throws ExpectationFailedException
+     * @throws HandlerException
      * @throws JmsLogicException
      * @throws JmsRuntimeException
      * @throws NotAcceptableException
      * @throws SebastianBergmannInvalidArgumentException
+     * @throws SetException
      * @throws UnsupportedFormatException
-     * @throws CollectionException
+     * @throws ExpectationFailedException
      */
     public function serializeShouldConvertACompanyIntoAJsonString(): void
     {
@@ -223,13 +228,14 @@ class TypedCollectionSerializationHandlerTest extends TestCase
      * @test
      *
      * @return void
-     * @throws ExpectationFailedException
+     * @throws HandlerException
      * @throws JmsLogicException
      * @throws JmsRuntimeException
      * @throws NotAcceptableException
      * @throws SebastianBergmannInvalidArgumentException
+     * @throws SetException
      * @throws UnsupportedFormatException
-     * @throws CollectionException
+     * @throws ExpectationFailedException
      */
     public function deserializeShouldConvertXmlStringIntoACompanyObject(): void
     {
@@ -243,13 +249,14 @@ class TypedCollectionSerializationHandlerTest extends TestCase
      * @test
      *
      * @return void
-     * @throws ExpectationFailedException
+     * @throws HandlerException
      * @throws JmsLogicException
      * @throws JmsRuntimeException
      * @throws NotAcceptableException
      * @throws SebastianBergmannInvalidArgumentException
+     * @throws SetException
      * @throws UnsupportedFormatException
-     * @throws CollectionException
+     * @throws ExpectationFailedException
      */
     public function serializeShouldConvertACompanyObjectIntoAJsonString(): void
     {
@@ -284,8 +291,9 @@ class TypedCollectionSerializationHandlerTest extends TestCase
      * @throws JmsLogicException
      * @throws JmsRuntimeException
      * @throws NotAcceptableException
+     * @throws SetException
      * @throws UnsupportedFormatException
-     * @throws CollectionException
+     * @throws HandlerException
      */
     public function serializeShouldConvertACompanyObjectIntoAYamlString(): void
     {
@@ -298,13 +306,14 @@ class TypedCollectionSerializationHandlerTest extends TestCase
     }
 
     /**
-     * @throws CollectionException
      * @return Company
+     * @throws HandlerException
+     * @throws SetException
      */
     private function getCompanyObject(): Company
     {
         $companyObject = new Company('Apple Computer, Inc.');
-        $companyObject->getEmployees()->pushElements([
+        $companyObject->getEmployees()->addAll([
             new Employee('Joost Nijhuis'),
             new Employee('John Doe')
         ]);

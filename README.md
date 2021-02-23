@@ -44,6 +44,9 @@ $serializer = (new \JMS\Serializer\SerializerBuilder())
         $handlerRegistry->registerSubscribingHandler(
             new \Jojo1981\JmsSerializerHandlers\TypedCollectionSerializationHandler()
         );
+        $handlerRegistry->registerSubscribingHandler(
+            new \Jojo1981\JmsSerializerHandlers\TypedSetSerializationHandler()
+        );
     })
     ->build();
 ```

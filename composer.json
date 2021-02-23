@@ -22,13 +22,14 @@
   "prefer-stable": true,
   "minimum-stability": "dev",
   "require": {
-    "php": "^7.2",
+    "php": "^7.4",
     "jms/serializer": "^3.0",
-    "jojo1981/typed-collection": "^2.0"
+    "jojo1981/typed-collection": "^2.0",
+    "jojo1981/typed-set": "^1.6"
   },
   "require-dev": {
     "doctrine/cache": "^1.8",
-    "php-coveralls/php-coveralls": "2.1.x-dev",
+    "php-coveralls/php-coveralls": "^2.4",
     "phpunit/phpunit": "^8.0"
   },
   "autoload": {

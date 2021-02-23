@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <serializer>
-    <class name="tests\Jojo1981\JmsSerializerHandlers\Fixtures\Company" access-type="property" exclusion-policy="ALL" xml-root-name="company">
+    <class name="tests\Jojo1981\JmsSerializerHandlers\Fixtures\Set\Company" access-type="property" exclusion-policy="ALL" xml-root-name="company">
         <property name="name" xml-attribute="true" type="string" expose="true"/>
         <property name="employees" expose="true">
-            <type><![CDATA[Jojo1981\TypedCollection\Collection<tests\Jojo1981\JmsSerializerHandlers\Fixtures\Employee>]]></type>
+            <type><![CDATA[Jojo1981\TypedSet\Set<tests\Jojo1981\JmsSerializerHandlers\Fixtures\Set\Employee>]]></type>
             <xml-list inline="false" entry-name="employee" skip-when-empty="true"/>
         </property>
     </class>

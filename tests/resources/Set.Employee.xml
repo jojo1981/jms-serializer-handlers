@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <serializer>
-    <class name="tests\Jojo1981\JmsSerializerHandlers\Fixtures\Employee" access-type="property" exclusion-policy="ALL">
+    <class name="tests\Jojo1981\JmsSerializerHandlers\Fixtures\Set\Employee" access-type="property" exclusion-policy="ALL">
         <property name="name" xml-attribute="true" type="string" expose="true"/>
     </class>
 </serializer>
