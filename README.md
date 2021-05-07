@@ -36,17 +36,32 @@ composer require jojo1981/jms-serializer-handlers
 ```php
 <?php
 
+use JMS\Serializer\Accessor\DefaultAccessorStrategy;
+use JMS\Serializer\Construction\UnserializeObjectConstructor;
+use JMS\Serializer\Handler\HandlerRegistry;
+use JMS\Serializer\Naming\CamelCaseNamingStrategy;
+use JMS\Serializer\Naming\SerializedNameAnnotationStrategy;
+use JMS\Serializer\SerializerBuilder;
+use Jojo1981\JmsSerializerHandlers\TypedCollectionAccessorStrategyDecorator;
+use Jojo1981\JmsSerializerHandlers\TypedCollectionObjectConstructorDecorator;
+use Jojo1981\JmsSerializerHandlers\TypedCollectionSerializationHandler;
+use Jojo1981\JmsSerializerHandlers\TypedSetSerializationHandler;
+
 require 'vendor/autoload.php';
 
-$serializer = (new \JMS\Serializer\SerializerBuilder())
+$propertyNamingStrategy = new SerializedNameAnnotationStrategy(new CamelCaseNamingStrategy());
+$accessorStrategy = new TypedCollectionAccessorStrategyDecorator(new DefaultAccessorStrategy());
+
+$serializer = (new SerializerBuilder())
+    ->setDebug(true)
+    ->setCacheDir(__DIR__ . '/var/cache/serializer')
+    ->setAccessorStrategy($accessorStrategy)
+    ->setPropertyNamingStrategy($propertyNamingStrategy)
     ->addDefaultHandlers()
-    ->configureHandlers(static function (\JMS\Serializer\Handler\HandlerRegistry $handlerRegistry): void {
-        $handlerRegistry->registerSubscribingHandler(
-            new \Jojo1981\JmsSerializerHandlers\TypedCollectionSerializationHandler()
-        );
-        $handlerRegistry->registerSubscribingHandler(
-            new \Jojo1981\JmsSerializerHandlers\TypedSetSerializationHandler()
-        );
+    ->configureHandlers(static function (HandlerRegistry $handlerRegistry): void {
+        $handlerRegistry->registerSubscribingHandler(new TypedCollectionSerializationHandler());
+        $handlerRegistry->registerSubscribingHandler(new TypedSetSerializationHandler());
     })
+    ->setObjectConstructor(new TypedCollectionObjectConstructorDecorator(new UnserializeObjectConstructor()))
     ->build();
 ```

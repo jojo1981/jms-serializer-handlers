@@ -11,15 +11,21 @@ namespace tests\Jojo1981\JmsSerializerHandlers\Tests;
 
 use Doctrine\Common\Annotations\AnnotationException;
 use InvalidArgumentException;
+use JMS\Serializer\Accessor\DefaultAccessorStrategy;
+use JMS\Serializer\Construction\UnserializeObjectConstructor;
 use JMS\Serializer\Exception\InvalidArgumentException as JmsInvalidArgumentException;
 use JMS\Serializer\Exception\LogicException as JmsLogicException;
 use JMS\Serializer\Exception\NotAcceptableException;
 use JMS\Serializer\Exception\RuntimeException as JmsRuntimeException;
 use JMS\Serializer\Exception\UnsupportedFormatException;
 use JMS\Serializer\Handler\HandlerRegistry;
+use JMS\Serializer\Naming\CamelCaseNamingStrategy;
+use JMS\Serializer\Naming\SerializedNameAnnotationStrategy;
 use JMS\Serializer\Serializer;
 use JMS\Serializer\SerializerBuilder;
 use Jojo1981\JmsSerializerHandlers\Exception\SerializationHandlerException;
+use Jojo1981\JmsSerializerHandlers\TypedCollectionAccessorStrategyDecorator;
+use Jojo1981\JmsSerializerHandlers\TypedCollectionObjectConstructorDecorator;
 use Jojo1981\JmsSerializerHandlers\TypedCollectionSerializationHandler;
 use Jojo1981\TypedCollection\Collection;
 use Jojo1981\TypedCollection\Exception\CollectionException;
@@ -47,9 +53,14 @@ class TypedCollectionSerializationHandlerTest extends TestCase
      */
     protected function setUp(): void
     {
+        $propertyNamingStrategy = new SerializedNameAnnotationStrategy(new CamelCaseNamingStrategy());
+        $accessorStrategy = new TypedCollectionAccessorStrategyDecorator(new DefaultAccessorStrategy());
+
         $this->serializer = (new SerializerBuilder())
-            ->setCacheDir(__DIR__ . '/../../var/cache')
             ->setDebug(true)
+            ->setCacheDir(__DIR__ . '/../../var/cache')
+            ->setAccessorStrategy($accessorStrategy)
+            ->setPropertyNamingStrategy($propertyNamingStrategy)
             ->addMetadataDirs([
                 'tests\Jojo1981\JmsSerializerHandlers\Fixtures' => __DIR__ . '/../resources'
             ])
@@ -57,6 +68,7 @@ class TypedCollectionSerializationHandlerTest extends TestCase
             ->configureHandlers(static function (HandlerRegistry $handlerRegistry): void {
                 $handlerRegistry->registerSubscribingHandler(new TypedCollectionSerializationHandler());
             })
+            ->setObjectConstructor(new TypedCollectionObjectConstructorDecorator(new UnserializeObjectConstructor()))
             ->build();
     }
 
@@ -231,6 +243,46 @@ class TypedCollectionSerializationHandlerTest extends TestCase
      * @throws UnsupportedFormatException
      * @throws CollectionException
      */
+    public function deserializeWithMissingCollectionDataShouldCreateClassWithEmptyCollection(): void
+    {
+        $companyObject = $this->getCompanyObject(false);
+        $jsonString = $this->getJsonStringWithMissingEmployees();
+
+        self::assertEquals($companyObject, $this->serializer->deserialize($jsonString, Company::class, 'json'));
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     * @throws ExpectationFailedException
+     * @throws JmsLogicException
+     * @throws JmsRuntimeException
+     * @throws NotAcceptableException
+     * @throws SebastianBergmannInvalidArgumentException
+     * @throws UnsupportedFormatException
+     * @throws CollectionException
+     */
+    public function deserializeNullValueForCollectionShouldBeSetAsEmptyCollection(): void
+    {
+        $companyObject = $this->getCompanyObject(false);
+        $jsonString = $this->getJsonStringWithEmployeesAsNullValue();
+
+        self::assertEquals($companyObject, $this->serializer->deserialize($jsonString, Company::class, 'json'));
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     * @throws ExpectationFailedException
+     * @throws JmsLogicException
+     * @throws JmsRuntimeException
+     * @throws NotAcceptableException
+     * @throws SebastianBergmannInvalidArgumentException
+     * @throws UnsupportedFormatException
+     * @throws CollectionException
+     */
     public function deserializeShouldConvertXmlStringIntoACompanyObject(): void
     {
         $companyObject = $this->getCompanyObject();
@@ -298,16 +350,19 @@ class TypedCollectionSerializationHandlerTest extends TestCase
     }
 
     /**
-     * @throws CollectionException
+     * @param bool $withEmployees
      * @return Company
+     * @throws CollectionException
      */
-    private function getCompanyObject(): Company
+    private function getCompanyObject(bool $withEmployees = true): Company
     {
         $companyObject = new Company('Apple Computer, Inc.');
-        $companyObject->getEmployees()->pushElements([
-            new Employee('Joost Nijhuis'),
-            new Employee('John Doe')
-        ]);
+        if ($withEmployees) {
+            $companyObject->getEmployees()->pushElements([
+                new Employee('Joost Nijhuis'),
+                new Employee('John Doe')
+            ]);
+        }
 
         return $companyObject;
     }
@@ -332,6 +387,22 @@ class TypedCollectionSerializationHandlerTest extends TestCase
     private function getJsonString(): string
     {
         return '{"name":"Apple Computer, Inc.","employees":[{"name":"Joost Nijhuis"},{"name":"John Doe"}]}';
+    }
+
+    /**
+     * @return string
+     */
+    private function getJsonStringWithMissingEmployees(): string
+    {
+        return '{"name":"Apple Computer, Inc."}';
+    }
+
+    /**
+     * @return string
+     */
+    private function getJsonStringWithEmployeesAsNullValue(): string
+    {
+        return '{"name":"Apple Computer, Inc.","employees": null}';
     }
 
     /**

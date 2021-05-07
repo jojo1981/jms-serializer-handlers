@@ -22,7 +22,7 @@
   "prefer-stable": true,
   "minimum-stability": "dev",
   "require": {
-    "php": "^7.4",
+    "php": "^7.4|^8.0",
     "jms/serializer": "^3.0",
     "jojo1981/typed-collection": "^2.0",
     "jojo1981/typed-set": "^1.6"
