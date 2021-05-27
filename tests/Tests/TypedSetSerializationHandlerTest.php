@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the jojo1981/jms-serializer-handlers package
  *
@@ -11,54 +11,34 @@ namespace tests\Jojo1981\JmsSerializerHandlers\Tests;
 
 use Doctrine\Common\Annotations\AnnotationException;
 use InvalidArgumentException;
-use JMS\Serializer\Exception\InvalidArgumentException as JmsInvalidArgumentException;
-use JMS\Serializer\Exception\LogicException as JmsLogicException;
+use JMS\Serializer\Exception\InvalidArgumentException as JmsSerializerInvalidArgumentException;
+use JMS\Serializer\Exception\LogicException as JmsSerializerLogicException;
 use JMS\Serializer\Exception\NotAcceptableException;
-use JMS\Serializer\Exception\RuntimeException as JmsRuntimeException;
+use JMS\Serializer\Exception\RuntimeException as JmsSerializerRuntimeException;
 use JMS\Serializer\Exception\UnsupportedFormatException;
-use JMS\Serializer\Handler\HandlerRegistry;
-use JMS\Serializer\Serializer;
-use JMS\Serializer\SerializerBuilder;
+use JMS\Serializer\Handler\HandlerRegistryInterface;
+use Jojo1981\Contracts\Exception\ValueExceptionInterface;
 use Jojo1981\JmsSerializerHandlers\Exception\SerializationHandlerException;
 use Jojo1981\JmsSerializerHandlers\TypedSetSerializationHandler;
 use Jojo1981\TypedSet\Exception\SetException;
 use Jojo1981\TypedSet\Handler\Exception\HandlerException;
 use Jojo1981\TypedSet\Set;
 use PHPUnit\Framework\ExpectationFailedException;
-use PHPUnit\Framework\TestCase;
 use SebastianBergmann\RecursionContext\InvalidArgumentException as SebastianBergmannInvalidArgumentException;
 use tests\Jojo1981\JmsSerializerHandlers\Fixtures\Set\Company;
-use tests\Jojo1981\JmsSerializerHandlers\Fixtures\Set\Employee;
 
 /**
  * @package tests\Jojo1981\JmsSerializerHandlers\Tests
  */
-class TypedSetSerializationHandlerTest extends TestCase
+final class TypedSetSerializationHandlerTest extends AbstractSerializationTest
 {
-    /** @var Serializer|null */
-    private ?Serializer $serializer = null;
-
     /**
+     * @param HandlerRegistryInterface $handlerRegistry
      * @return void
-     * @throws JmsRuntimeException
-     * @throws AnnotationException
-     * @throws InvalidArgumentException
-     * @throws JmsLogicException
-     * @throws JmsInvalidArgumentException
      */
-    protected function setUp(): void
+    protected function configureHandlers(HandlerRegistryInterface $handlerRegistry): void
     {
-        $this->serializer = (new SerializerBuilder())
-            ->setCacheDir(__DIR__ . '/../../var/cache')
-            ->setDebug(true)
-            ->addMetadataDirs([
-                'tests\Jojo1981\JmsSerializerHandlers\Fixtures' => __DIR__ . '/../resources'
-            ])
-            ->addDefaultHandlers()
-            ->configureHandlers(static function (HandlerRegistry $handlerRegistry): void {
-                $handlerRegistry->registerSubscribingHandler(new TypedSetSerializationHandler());
-            })
-            ->build();
+        $handlerRegistry->registerSubscribingHandler(new TypedSetSerializationHandler());
     }
 
     /**
@@ -86,194 +66,217 @@ class TypedSetSerializationHandlerTest extends TestCase
      * @test
      *
      * @return void
-     * @throws JmsRuntimeException
-     * @throws UnsupportedFormatException
+     * @throws InvalidArgumentException
+     * @throws JmsSerializerLogicException
+     * @throws JmsSerializerRuntimeException
+     * @throws JmsSerializerInvalidArgumentException
      * @throws NotAcceptableException
-     * @throws JmsLogicException
+     * @throws UnsupportedFormatException
+     * @throws AnnotationException
      */
     public function invalidConfigurationMissingParametersShouldThrowAnSerializationHandlerException(): void
     {
-        $this->expectExceptionObject(new SerializationHandlerException(
-            'Invalid config for serialization type: `Jojo1981\TypedSet\Set` given. You MUST add a ' .
-            'parameter which contains the value of for the type of the collection. This value can be a primitive type,' .
-            ' fully qualified class name or fully qualified interface name'
-        ));
-
-        $this->serializer->deserialize('[]', Set::class, 'json');
+        $this->expectExceptionObject(SerializationHandlerException::invalidConfigMissingTypeValue(Set::class));
+        $this->getSerializer()->deserialize('[]', Set::class, 'json');
     }
 
     /**
      * @test
      *
      * @return void
-     * @throws JmsRuntimeException
+     * @throws InvalidArgumentException
+     * @throws JmsSerializerLogicException
+     * @throws JmsSerializerRuntimeException
+     * @throws JmsSerializerInvalidArgumentException
      * @throws NotAcceptableException
      * @throws UnsupportedFormatException
-     * @throws JmsLogicException
+     * @throws AnnotationException
      */
     public function invalidConfigurationTypeParameterHasInvalidTypeValueShouldThrowAnSerializationHandlerException(): void
     {
-        $this->expectExceptionObject(new SerializationHandlerException(
-            'Invalid config for serialization type: `Jojo1981\TypedSet\Set` given. The type parameter ' .
-            'value: `invalidType` is not valid'
-        ));
-
-        $this->serializer->deserialize('[]', Set::class . '<invalidType>', 'json');
+        $this->expectExceptionObject(SerializationHandlerException::invalidConfigTypeValueInvalid(Set::class, 'invalidType'));
+        $this->getSerializer()->deserialize('[]', Set::class . '<invalidType>', 'json');
     }
 
     /**
      * @test
      *
      * @return void
-     * @throws JmsRuntimeException
+     * @throws InvalidArgumentException
+     * @throws JmsSerializerLogicException
+     * @throws JmsSerializerRuntimeException
+     * @throws JmsSerializerInvalidArgumentException
      * @throws NotAcceptableException
      * @throws UnsupportedFormatException
-     * @throws JmsLogicException
+     * @throws AnnotationException
      */
     public function invalidConfigurationTooManyParametersShouldThrowAnSerializationHandlerException(): void
     {
-        $this->expectExceptionObject(new SerializationHandlerException(
-            'Invalid config for serialization type: `Jojo1981\TypedSet\Set` given. Too many parameters ' .
-            'given. This config expect 1 parameter, but got 3 number of parameters given'
-        ));
-
-        $this->serializer->deserialize('[]', Set::class . '<string, arg2, arg3>', 'json');
+        $this->expectExceptionObject(SerializationHandlerException::invalidConfigTooManyParameters(Set::class, 3));
+        $this->getSerializer()->deserialize('[]', Set::class . '<string, arg2, arg3>', 'json');
     }
 
     /**
      * @test
      *
      * @return void
+     * @throws AnnotationException
+     * @throws ExpectationFailedException
      * @throws HandlerException
-     * @throws JmsLogicException
-     * @throws JmsRuntimeException
+     * @throws InvalidArgumentException
+     * @throws JmsSerializerLogicException
+     * @throws JmsSerializerRuntimeException
+     * @throws JmsSerializerInvalidArgumentException
      * @throws NotAcceptableException
      * @throws SebastianBergmannInvalidArgumentException
      * @throws SetException
      * @throws UnsupportedFormatException
-     * @throws ExpectationFailedException
+     * @throws ValueExceptionInterface
      */
     public function toArrayShouldConvertTheCompanyObjectIntoAnArray(): void
     {
         $companyObject = $this->getCompanyObject();
         $companyArray = $this->getCompanyArray();
 
-        self::assertEquals($companyArray, $this->serializer->toArray($companyObject));
+        self::assertEquals($companyArray, $this->getSerializer()->toArray($companyObject));
     }
 
     /**
      * @test
      *
      * @return void
+     * @throws AnnotationException
+     * @throws ExpectationFailedException
      * @throws HandlerException
-     * @throws JmsLogicException
-     * @throws JmsRuntimeException
+     * @throws InvalidArgumentException
+     * @throws JmsSerializerLogicException
+     * @throws JmsSerializerRuntimeException
+     * @throws JmsSerializerInvalidArgumentException
      * @throws NotAcceptableException
      * @throws SebastianBergmannInvalidArgumentException
      * @throws SetException
      * @throws UnsupportedFormatException
-     * @throws ExpectationFailedException
+     * @throws ValueExceptionInterface
      */
     public function fromArrayShouldConvertAnArrayIntoACompanyObject(): void
     {
         $companyObject = $this->getCompanyObject();
         $companyArray = $this->getCompanyArray();
 
-        self::assertEquals($companyObject, $this->serializer->fromArray($companyArray, Company::class));
+        self::assertEquals($companyObject, $this->getSerializer()->fromArray($companyArray, Company::class));
     }
 
     /**
      * @test
      *
      * @return void
+     * @throws AnnotationException
+     * @throws ExpectationFailedException
      * @throws HandlerException
-     * @throws JmsLogicException
-     * @throws JmsRuntimeException
+     * @throws InvalidArgumentException
+     * @throws JmsSerializerLogicException
+     * @throws JmsSerializerRuntimeException
+     * @throws JmsSerializerInvalidArgumentException
      * @throws NotAcceptableException
      * @throws SebastianBergmannInvalidArgumentException
      * @throws SetException
      * @throws UnsupportedFormatException
-     * @throws ExpectationFailedException
+     * @throws ValueExceptionInterface
      */
     public function deserializeShouldConvertJsonStringIntoACompanyObject(): void
     {
         $companyObject = $this->getCompanyObject();
         $jsonString = $this->getJsonString();
 
-        self::assertEquals($companyObject, $this->serializer->deserialize($jsonString, Company::class, 'json'));
+        self::assertEquals($companyObject, $this->getSerializer()->deserialize($jsonString, Company::class, 'json'));
     }
 
     /**
      * @test
      *
      * @return void
+     * @throws AnnotationException
+     * @throws ExpectationFailedException
      * @throws HandlerException
-     * @throws JmsLogicException
-     * @throws JmsRuntimeException
+     * @throws InvalidArgumentException
+     * @throws JmsSerializerLogicException
+     * @throws JmsSerializerRuntimeException
+     * @throws JmsSerializerInvalidArgumentException
      * @throws NotAcceptableException
      * @throws SebastianBergmannInvalidArgumentException
      * @throws SetException
      * @throws UnsupportedFormatException
-     * @throws ExpectationFailedException
+     * @throws ValueExceptionInterface
      */
     public function serializeShouldConvertACompanyIntoAJsonString(): void
     {
         $companyObject = $this->getCompanyObject();
         $jsonString = $this->getJsonString();
 
-        self::assertEquals($jsonString, $this->serializer->serialize($companyObject, 'json'));
+        self::assertEquals($jsonString, $this->getSerializer()->serialize($companyObject, 'json'));
     }
 
     /**
      * @test
      *
      * @return void
+     * @throws AnnotationException
+     * @throws ExpectationFailedException
      * @throws HandlerException
-     * @throws JmsLogicException
-     * @throws JmsRuntimeException
+     * @throws InvalidArgumentException
+     * @throws JmsSerializerLogicException
+     * @throws JmsSerializerRuntimeException
+     * @throws JmsSerializerInvalidArgumentException
      * @throws NotAcceptableException
      * @throws SebastianBergmannInvalidArgumentException
      * @throws SetException
      * @throws UnsupportedFormatException
-     * @throws ExpectationFailedException
+     * @throws ValueExceptionInterface
      */
     public function deserializeShouldConvertXmlStringIntoACompanyObject(): void
     {
         $companyObject = $this->getCompanyObject();
         $xmlString = $this->getXmlString();
 
-        self::assertEquals($companyObject, $this->serializer->deserialize($xmlString, Company::class, 'xml'));
+        self::assertEquals($companyObject, $this->getSerializer()->deserialize($xmlString, Company::class, 'xml'));
     }
 
     /**
      * @test
      *
      * @return void
+     * @throws AnnotationException
+     * @throws ExpectationFailedException
      * @throws HandlerException
-     * @throws JmsLogicException
-     * @throws JmsRuntimeException
+     * @throws InvalidArgumentException
+     * @throws JmsSerializerLogicException
+     * @throws JmsSerializerRuntimeException
+     * @throws JmsSerializerInvalidArgumentException
      * @throws NotAcceptableException
      * @throws SebastianBergmannInvalidArgumentException
      * @throws SetException
      * @throws UnsupportedFormatException
-     * @throws ExpectationFailedException
+     * @throws ValueExceptionInterface
      */
     public function serializeShouldConvertACompanyObjectIntoAJsonString(): void
     {
         $companyObject = $this->getCompanyObject();
         $xmlString = $this->getXmlString();
 
-        self::assertEquals($xmlString, $this->serializer->serialize($companyObject, 'xml'));
+        self::assertEquals($xmlString, $this->getSerializer()->serialize($companyObject, 'xml'));
     }
 
     /**
      * @test
      *
      * @return void
-     * @throws JmsRuntimeException
+     * @throws InvalidArgumentException
+     * @throws JmsSerializerLogicException
+     * @throws JmsSerializerRuntimeException
+     * @throws JmsSerializerInvalidArgumentException
      * @throws NotAcceptableException
      * @throws UnsupportedFormatException
-     * @throws JmsLogicException
+     * @throws AnnotationException
      */
     public function deserializeShouldConvertYamlStringIntoACompanyObject(): void
     {
@@ -281,19 +284,23 @@ class TypedSetSerializationHandlerTest extends TestCase
             new UnsupportedFormatException('The format "yml" is not supported for deserialization.')
         );
 
-        $this->serializer->deserialize($this->getYamlString(), Company::class, 'yml');
+        $this->getSerializer()->deserialize($this->getYamlString(), Company::class, 'yml');
     }
 
     /**
      * @test
      *
      * @return void
-     * @throws JmsLogicException
-     * @throws JmsRuntimeException
+     * @throws HandlerException
+     * @throws JmsSerializerLogicException
+     * @throws JmsSerializerRuntimeException
      * @throws NotAcceptableException
      * @throws SetException
      * @throws UnsupportedFormatException
-     * @throws HandlerException
+     * @throws ValueExceptionInterface
+     * @throws AnnotationException
+     * @throws InvalidArgumentException
+     * @throws JmsSerializerInvalidArgumentException
      */
     public function serializeShouldConvertACompanyObjectIntoAYamlString(): void
     {
@@ -302,78 +309,17 @@ class TypedSetSerializationHandlerTest extends TestCase
         );
 
         $companyObject = $this->getCompanyObject();
-        $this->serializer->serialize($companyObject, 'yml');
+        $this->getSerializer()->serialize($companyObject, 'yml');
     }
 
     /**
      * @return Company
-     * @throws HandlerException
      * @throws SetException
+     * @throws ValueExceptionInterface
+     * @throws HandlerException
      */
     private function getCompanyObject(): Company
     {
-        $companyObject = new Company('Apple Computer, Inc.');
-        $companyObject->getEmployees()->addAll([
-            new Employee('Joost Nijhuis'),
-            new Employee('John Doe')
-        ]);
-
-        return $companyObject;
-    }
-
-    /**
-     * @return array[]
-     */
-    private function getCompanyArray(): array
-    {
-        return [
-            'name' => 'Apple Computer, Inc.',
-            'employees' => [
-                ['name' => 'Joost Nijhuis'],
-                ['name' => 'John Doe']
-            ]
-        ];
-    }
-
-    /**
-     * @return string
-     */
-    private function getJsonString(): string
-    {
-        return '{"name":"Apple Computer, Inc.","employees":[{"name":"Joost Nijhuis"},{"name":"John Doe"}]}';
-    }
-
-    /**
-     * @return string
-     */
-    private function getXmlString(): string
-    {
-        return <<<XML
-<?xml version="1.0" encoding="UTF-8"?>
-<company name="Apple Computer, Inc.">
-  <employees>
-    <employee name="Joost Nijhuis"/>
-    <employee name="John Doe"/>
-  </employees>
-</company>
-
-XML;
-    }
-
-    /**
-     * @return string
-     */
-    private function getYamlString(): string
-    {
-        return <<<YAML
-name: 'Apple Computer, Inc.'
-employees:
-    -
-        name: 'Joost Nijhuis'
-    -
-        name: 'John Doe'
-
-YAML;
-
+        return $this->getSetCompanyObject(true);
     }
 }

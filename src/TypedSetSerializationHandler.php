@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the jojo1981/jms-serializer-handlers package
  *
@@ -9,9 +9,10 @@
  */
 namespace Jojo1981\JmsSerializerHandlers;
 
-use JMS\Serializer\Context;
+use JMS\Serializer\Exception\RuntimeException as JmsSerializerRuntimeException;
 use JMS\Serializer\GraphNavigatorInterface;
 use JMS\Serializer\Handler\SubscribingHandlerInterface;
+use JMS\Serializer\SerializationContext;
 use JMS\Serializer\Visitor\DeserializationVisitorInterface;
 use JMS\Serializer\Visitor\SerializationVisitorInterface;
 use Jojo1981\JmsSerializerHandlers\Exception\SerializationHandlerException;
@@ -20,7 +21,6 @@ use Jojo1981\PhpTypes\Exception\TypeException;
 use Jojo1981\TypedSet\Set;
 use LogicException;
 use function count;
-use function sprintf;
 
 /**
  * @package Jojo1981\JmsSerializerHandlers
@@ -55,10 +55,11 @@ class TypedSetSerializationHandler implements SubscribingHandlerInterface
      * @param SerializationVisitorInterface $visitor
      * @param Set $set
      * @param array $type
-     * @param Context $context
+     * @param SerializationContext $context
      * @return null|array
+     * @throws JmsSerializerRuntimeException
      */
-    public function serializeSet(SerializationVisitorInterface $visitor, Set $set, array $type, Context $context): ?array
+    public function serializeSet(SerializationVisitorInterface $visitor, Set $set, array $type, SerializationContext $context): ?array
     {
         $type['name'] = 'array';
 
@@ -74,44 +75,25 @@ class TypedSetSerializationHandler implements SubscribingHandlerInterface
      * @param DeserializationVisitorInterface $visitor
      * @param mixed $data
      * @param array $type
-     * @param Context $context
      * @return Set
      * @throws LogicException
      */
-    public function deserializeSet(DeserializationVisitorInterface $visitor, $data, array $type, Context $context): Set
+    public function deserializeSet(DeserializationVisitorInterface $visitor, $data, array $type): Set
     {
         $collectionType = $type['params'][0]['name'] ?? null;
         if (empty($collectionType)) {
-            throw new SerializationHandlerException(sprintf(
-                'Invalid config for serialization type: `%s` given. You MUST add a parameter which contains the value' .
-                ' of for the type of the collection. This value can be a primitive type, fully qualified class name or' .
-                ' fully qualified interface name',
-                Set::class
-            ));
+            throw SerializationHandlerException::invalidConfigMissingTypeValue(Set::class);
         }
 
         try {
             AbstractType::createFromTypeName($collectionType);
         } catch (TypeException $exception) {
-            throw new SerializationHandlerException(
-                sprintf(
-                    'Invalid config for serialization type: `%s` given. The type parameter value: `%s` is not valid',
-                    Set::class,
-                    $collectionType
-                ),
-                0,
-                $exception
-            );
+            throw SerializationHandlerException::invalidConfigTypeValueInvalid(Set::class, $collectionType, $exception);
         }
 
         $numberOfParameters = count($type['params']);
         if ($numberOfParameters > 1) {
-            throw new SerializationHandlerException(sprintf(
-                'Invalid config for serialization type: `%s` given. Too many parameters given. This config expect 1' .
-                ' parameter, but got %d number of parameters given',
-                Set::class,
-                $numberOfParameters
-            ));
+            throw SerializationHandlerException::invalidConfigTooManyParameters(Set::class, $numberOfParameters);
         }
 
         $type['name'] = 'array';

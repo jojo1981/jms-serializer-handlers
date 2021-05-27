@@ -3,7 +3,7 @@
     <class name="tests\Jojo1981\JmsSerializerHandlers\Fixtures\Collection\Company" access-type="property" exclusion-policy="ALL" xml-root-name="company">
         <property name="name" xml-attribute="true" type="string" expose="true"/>
         <property name="employees" expose="true">
-            <type><![CDATA[Jojo1981\TypedCollection\Collection<tests\Jojo1981\JmsSerializerHandlers\Fixtures\Collection\Employee>]]></type>
+            <type><![CDATA[Jojo1981\TypedCollection\Collection<tests\Jojo1981\JmsSerializerHandlers\Fixtures\Entity\Employee>]]></type>
             <xml-list inline="false" entry-name="employee" skip-when-empty="true"/>
         </property>
     </class>

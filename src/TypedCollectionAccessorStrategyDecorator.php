@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the jojo1981/jms-serializer-handlers package
  *
@@ -19,7 +19,7 @@ use Jojo1981\TypedCollection\Exception\CollectionException;
 /**
  * @package Jojo1981\JmsSerializerHandlers
  */
-final class TypedCollectionAccessorStrategyDecorator  implements AccessorStrategyInterface
+final class TypedCollectionAccessorStrategyDecorator implements AccessorStrategyInterface
 {
     /** @var AccessorStrategyInterface */
     private AccessorStrategyInterface $accessorStrategy;

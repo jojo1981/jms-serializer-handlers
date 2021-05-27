@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the jojo1981/jms-serializer-handlers package
  *
@@ -11,6 +11,7 @@ namespace tests\Jojo1981\JmsSerializerHandlers\Fixtures\Collection;
 
 use Jojo1981\TypedCollection\Collection;
 use Jojo1981\TypedCollection\Exception\CollectionException;
+use tests\Jojo1981\JmsSerializerHandlers\Fixtures\Entity\Employee;
 
 /**
  * @package tests\Jojo1981\JmsSerializerHandlers\Fixtures\Collection

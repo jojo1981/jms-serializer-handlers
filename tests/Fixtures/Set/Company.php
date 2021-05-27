@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the jojo1981/jms-serializer-handlers package
  *
@@ -9,9 +9,10 @@
  */
 namespace tests\Jojo1981\JmsSerializerHandlers\Fixtures\Set;
 
+use Jojo1981\Contracts\HashableInterface;
 use Jojo1981\TypedSet\Exception\SetException;
-use Jojo1981\TypedSet\HashableInterface;
 use Jojo1981\TypedSet\Set;
+use tests\Jojo1981\JmsSerializerHandlers\Fixtures\Entity\Employee;
 use function hash;
 
 /**
