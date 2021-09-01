@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <serializer>
     <class name="tests\Jojo1981\JmsSerializerHandlers\Fixtures\Entity\Employee" access-type="property" exclusion-policy="ALL">
-        <property name="name" xml-attribute="true" type="string" expose="true"/>
-        <property name="age" xml-attribute="true" expose="true">
+        <property name="name" xml-attribute="true" type="string" expose="true" skip-when-empty="false"/>
+        <property name="age" xml-attribute="true" expose="true" skip-when-empty="false">
             <type><![CDATA[tests\Jojo1981\JmsSerializerHandlers\Fixtures\Value\Age<integer>]]></type>
+        </property>
+        <property name="media" expose="true" skip-when-empty="true">
+            <type>
+                <![CDATA[array<union<tests\Jojo1981\JmsSerializerHandlers\Fixtures\Entity\Book,tests\Jojo1981\JmsSerializerHandlers\Fixtures\Entity\Movie>>]]>
+            </type>
         </property>
     </class>
 </serializer>

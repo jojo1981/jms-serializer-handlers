@@ -28,6 +28,7 @@ use Jojo1981\TypedCollection\Exception\CollectionException;
 use Jojo1981\TypedSet\Exception\SetException;
 use Jojo1981\TypedSet\Handler\Exception\HandlerException;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use tests\Jojo1981\JmsSerializerHandlers\Fixtures\Collection\Company as CollectionCompany;
 use tests\Jojo1981\JmsSerializerHandlers\Fixtures\Entity\Employee;
 use tests\Jojo1981\JmsSerializerHandlers\Fixtures\Serialization\ValueSerializationHandler;
@@ -85,6 +86,7 @@ abstract class AbstractSerializationTest extends TestCase
     /**
      * @param bool $withEmployees
      * @return SetCompany
+     * @throws RuntimeException
      * @throws SetException
      * @throws ValueExceptionInterface
      * @throws HandlerException
@@ -106,6 +108,7 @@ abstract class AbstractSerializationTest extends TestCase
      * @param bool $withEmployees
      * @return CollectionCompany
      * @throws ValueExceptionInterface
+     * @throws RuntimeException
      * @throws CollectionException
      */
     final protected function getCollectionCompanyObject(bool $withEmployees): CollectionCompany

@@ -18,8 +18,10 @@ use JMS\Serializer\Visitor\SerializationVisitorInterface;
 use Jojo1981\JmsSerializerHandlers\Exception\SerializationHandlerException;
 use Jojo1981\PhpTypes\AbstractType;
 use Jojo1981\PhpTypes\Exception\TypeException;
+use Jojo1981\TypedSet\Exception\SetException;
+use Jojo1981\TypedSet\Handler\Exception\HandlerException;
 use Jojo1981\TypedSet\Set;
-use LogicException;
+use RuntimeException;
 use function count;
 
 /**
@@ -76,7 +78,10 @@ class TypedSetSerializationHandler implements SubscribingHandlerInterface
      * @param mixed $data
      * @param array $type
      * @return Set
-     * @throws LogicException
+     * @throws SetException
+     * @throws HandlerException
+     * @throws RuntimeException
+     * @throws SerializationHandlerException
      */
     public function deserializeSet(DeserializationVisitorInterface $visitor, $data, array $type): Set
     {

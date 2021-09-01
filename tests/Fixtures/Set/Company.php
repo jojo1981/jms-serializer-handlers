@@ -11,7 +11,9 @@ namespace tests\Jojo1981\JmsSerializerHandlers\Fixtures\Set;
 
 use Jojo1981\Contracts\HashableInterface;
 use Jojo1981\TypedSet\Exception\SetException;
+use Jojo1981\TypedSet\Handler\Exception\HandlerException;
 use Jojo1981\TypedSet\Set;
+use RuntimeException;
 use tests\Jojo1981\JmsSerializerHandlers\Fixtures\Entity\Employee;
 use function hash;
 
@@ -29,6 +31,8 @@ class Company implements HashableInterface
     /**
      * @param string $name
      * @throws SetException
+     * @throws HandlerException
+     * @throws RuntimeException
      */
     public function __construct(string $name)
     {

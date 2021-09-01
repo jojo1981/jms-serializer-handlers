@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<serializer>
+    <class name="tests\Jojo1981\JmsSerializerHandlers\Fixtures\Entity\MediaContainer" access-type="property" exclusion-policy="ALL">
+        <property name="media" expose="true" skip-when-empty="true">
+            <type>
+                <![CDATA[union<tests\Jojo1981\JmsSerializerHandlers\Fixtures\Entity\Book,tests\Jojo1981\JmsSerializerHandlers\Fixtures\Entity\Movie>]]>
+            </type>
+        </property>
+    </class>
+</serializer>

@@ -24,14 +24,19 @@ final class Employee implements HashableInterface
     /** @var Age */
     private Age $age;
 
+    /** @var Book[]|Movie[] */
+    private array $media;
+
     /**
      * @param string $name
      * @param Age $age
+     * @param Book[]|Movie[] $media
      */
-    public function __construct(string $name, Age $age)
+    public function __construct(string $name, Age $age, array $media = [])
     {
         $this->name = $name;
         $this->age = $age;
+        $this->media = $media;
     }
 
     /**
@@ -48,6 +53,23 @@ final class Employee implements HashableInterface
     public function getAge(): Age
     {
         return $this->age;
+    }
+
+    /**
+     * @return Book[]|Movie[]
+     */
+    public function getMedia(): array
+    {
+        return $this->media;
+    }
+
+    /**
+     * @param Book[]|Movie[] $media
+     * @return void
+     */
+    public function setMedia(array $media): void
+    {
+        $this->media = $media;
     }
 
     /**

@@ -11,6 +11,7 @@ namespace Jojo1981\JmsSerializerHandlers\Exception;
 
 use DomainException;
 use Throwable;
+use function implode;
 use function sprintf;
 
 /**
@@ -159,5 +160,43 @@ final class SerializationHandlerException extends DomainException
             $innerType,
             'integer, float or string'
         ));
+    }
+
+    /**
+     * @param string $handlerClassName
+     * @return self
+     */
+    public static function deserializeTypeNameMissingInData(string $handlerClassName): self
+    {
+        return new self(sprintf(
+            'Handler: `%s`. Missing key: `%s` with class name as value in the data to deserialize. The concrete type can not be determined',
+            $handlerClassName,
+            '__typename'
+        ));
+    }
+
+    /**
+     * @param string $handlerClassName
+     * @param string $className
+     * @param string[] $types
+     * @return self
+     */
+    public static function invalidClassNameConfigured(string $handlerClassName, string $className, array $types): self
+    {
+        return new self(sprintf(
+            'Handler: `%s`. Class name: `%s` is not in the list of configured types: [%s]',
+            $handlerClassName,
+            $className,
+            implode(', ', $types)
+        ));
+    }
+
+    /**
+     * @param string $handlerClassName
+     * @return self
+     */
+    public static function noTypesConfigured(string $handlerClassName): self
+    {
+        return new self(sprintf('Invalid configuration for handler: `%s`. No types are configured', $handlerClassName));
     }
 }

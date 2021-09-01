@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<serializer>
+    <class name="tests\Jojo1981\JmsSerializerHandlers\Fixtures\Entity\Book" access-type="property" exclusion-policy="ALL">
+        <property name="title" xml-attribute="true" type="string" expose="true" skip-when-empty="false"/>
+        <property name="author"
+                  xml-attribute="true"
+                  type="tests\Jojo1981\JmsSerializerHandlers\Fixtures\Entity\Author"
+                  expose="true"
+                  skip-when-empty="false"
+        />
+    </class>
+</serializer>

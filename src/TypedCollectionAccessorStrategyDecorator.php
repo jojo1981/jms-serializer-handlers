@@ -15,6 +15,7 @@ use JMS\Serializer\Metadata\PropertyMetadata;
 use JMS\Serializer\SerializationContext;
 use Jojo1981\TypedCollection\Collection;
 use Jojo1981\TypedCollection\Exception\CollectionException;
+use RuntimeException;
 
 /**
  * @package Jojo1981\JmsSerializerHandlers
@@ -49,6 +50,7 @@ final class TypedCollectionAccessorStrategyDecorator implements AccessorStrategy
      * @param PropertyMetadata $metadata
      * @param DeserializationContext $context
      * @return void
+     * @throws RuntimeException
      * @throws CollectionException
      */
     public function setValue(object $object, $value, PropertyMetadata $metadata, DeserializationContext $context): void

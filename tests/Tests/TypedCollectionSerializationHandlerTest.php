@@ -23,6 +23,7 @@ use Jojo1981\JmsSerializerHandlers\TypedCollectionSerializationHandler;
 use Jojo1981\TypedCollection\Collection;
 use Jojo1981\TypedCollection\Exception\CollectionException;
 use PHPUnit\Framework\ExpectationFailedException;
+use RuntimeException;
 use SebastianBergmann\RecursionContext\InvalidArgumentException as SebastianBergmannInvalidArgumentException;
 use tests\Jojo1981\JmsSerializerHandlers\Fixtures\Collection\Company;
 
@@ -123,10 +124,11 @@ final class TypedCollectionSerializationHandlerTest extends AbstractSerializatio
      * @throws CollectionException
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
+     * @throws JmsSerializerInvalidArgumentException
      * @throws JmsSerializerLogicException
      * @throws JmsSerializerRuntimeException
-     * @throws JmsSerializerInvalidArgumentException
      * @throws NotAcceptableException
+     * @throws RuntimeException
      * @throws SebastianBergmannInvalidArgumentException
      * @throws UnsupportedFormatException
      * @throws ValueExceptionInterface
@@ -147,10 +149,11 @@ final class TypedCollectionSerializationHandlerTest extends AbstractSerializatio
      * @throws CollectionException
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
+     * @throws JmsSerializerInvalidArgumentException
      * @throws JmsSerializerLogicException
      * @throws JmsSerializerRuntimeException
-     * @throws JmsSerializerInvalidArgumentException
      * @throws NotAcceptableException
+     * @throws RuntimeException
      * @throws SebastianBergmannInvalidArgumentException
      * @throws UnsupportedFormatException
      * @throws ValueExceptionInterface
@@ -171,10 +174,11 @@ final class TypedCollectionSerializationHandlerTest extends AbstractSerializatio
      * @throws CollectionException
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
+     * @throws JmsSerializerInvalidArgumentException
      * @throws JmsSerializerLogicException
      * @throws JmsSerializerRuntimeException
-     * @throws JmsSerializerInvalidArgumentException
      * @throws NotAcceptableException
+     * @throws RuntimeException
      * @throws SebastianBergmannInvalidArgumentException
      * @throws UnsupportedFormatException
      * @throws ValueExceptionInterface
@@ -195,10 +199,11 @@ final class TypedCollectionSerializationHandlerTest extends AbstractSerializatio
      * @throws CollectionException
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
+     * @throws JmsSerializerInvalidArgumentException
      * @throws JmsSerializerLogicException
      * @throws JmsSerializerRuntimeException
-     * @throws JmsSerializerInvalidArgumentException
      * @throws NotAcceptableException
+     * @throws RuntimeException
      * @throws SebastianBergmannInvalidArgumentException
      * @throws UnsupportedFormatException
      * @throws ValueExceptionInterface
@@ -219,10 +224,11 @@ final class TypedCollectionSerializationHandlerTest extends AbstractSerializatio
      * @throws CollectionException
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
+     * @throws JmsSerializerInvalidArgumentException
      * @throws JmsSerializerLogicException
      * @throws JmsSerializerRuntimeException
-     * @throws JmsSerializerInvalidArgumentException
      * @throws NotAcceptableException
+     * @throws RuntimeException
      * @throws SebastianBergmannInvalidArgumentException
      * @throws UnsupportedFormatException
      * @throws ValueExceptionInterface
@@ -243,10 +249,11 @@ final class TypedCollectionSerializationHandlerTest extends AbstractSerializatio
      * @throws CollectionException
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
+     * @throws JmsSerializerInvalidArgumentException
      * @throws JmsSerializerLogicException
      * @throws JmsSerializerRuntimeException
-     * @throws JmsSerializerInvalidArgumentException
      * @throws NotAcceptableException
+     * @throws RuntimeException
      * @throws SebastianBergmannInvalidArgumentException
      * @throws UnsupportedFormatException
      * @throws ValueExceptionInterface
@@ -267,10 +274,11 @@ final class TypedCollectionSerializationHandlerTest extends AbstractSerializatio
      * @throws CollectionException
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
+     * @throws JmsSerializerInvalidArgumentException
      * @throws JmsSerializerLogicException
      * @throws JmsSerializerRuntimeException
-     * @throws JmsSerializerInvalidArgumentException
      * @throws NotAcceptableException
+     * @throws RuntimeException
      * @throws SebastianBergmannInvalidArgumentException
      * @throws UnsupportedFormatException
      * @throws ValueExceptionInterface
@@ -291,10 +299,11 @@ final class TypedCollectionSerializationHandlerTest extends AbstractSerializatio
      * @throws CollectionException
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
+     * @throws JmsSerializerInvalidArgumentException
      * @throws JmsSerializerLogicException
      * @throws JmsSerializerRuntimeException
-     * @throws JmsSerializerInvalidArgumentException
      * @throws NotAcceptableException
+     * @throws RuntimeException
      * @throws SebastianBergmannInvalidArgumentException
      * @throws UnsupportedFormatException
      * @throws ValueExceptionInterface
@@ -332,15 +341,16 @@ final class TypedCollectionSerializationHandlerTest extends AbstractSerializatio
      * @test
      *
      * @return void
+     * @throws AnnotationException
      * @throws CollectionException
+     * @throws InvalidArgumentException
+     * @throws JmsSerializerInvalidArgumentException
      * @throws JmsSerializerLogicException
      * @throws JmsSerializerRuntimeException
      * @throws NotAcceptableException
+     * @throws RuntimeException
      * @throws UnsupportedFormatException
      * @throws ValueExceptionInterface
-     * @throws AnnotationException
-     * @throws InvalidArgumentException
-     * @throws JmsSerializerInvalidArgumentException
      */
     public function serializeShouldConvertACompanyObjectIntoAYamlString(): void
     {
@@ -356,6 +366,7 @@ final class TypedCollectionSerializationHandlerTest extends AbstractSerializatio
      * @param bool $withEmployees
      * @return Company
      * @throws ValueExceptionInterface
+     * @throws RuntimeException
      * @throws CollectionException
      */
     private function getCompanyObject(bool $withEmployees = true): Company

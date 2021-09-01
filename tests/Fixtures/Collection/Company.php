@@ -11,6 +11,7 @@ namespace tests\Jojo1981\JmsSerializerHandlers\Fixtures\Collection;
 
 use Jojo1981\TypedCollection\Collection;
 use Jojo1981\TypedCollection\Exception\CollectionException;
+use RuntimeException;
 use tests\Jojo1981\JmsSerializerHandlers\Fixtures\Entity\Employee;
 
 /**
@@ -27,6 +28,7 @@ class Company
     /**
      * @param string $name
      * @throws CollectionException
+     * @throws RuntimeException
      */
     public function __construct(string $name)
     {

@@ -46,6 +46,7 @@ use Jojo1981\JmsSerializerHandlers\TypedCollectionAccessorStrategyDecorator;
 use Jojo1981\JmsSerializerHandlers\TypedCollectionObjectConstructorDecorator;
 use Jojo1981\JmsSerializerHandlers\TypedCollectionSerializationHandler;
 use Jojo1981\JmsSerializerHandlers\TypedSetSerializationHandler;
+use Jojo1981\JmsSerializerHandlers\UnionSerializationHandler;
 
 require 'vendor/autoload.php';
 
@@ -61,6 +62,7 @@ $serializer = (new SerializerBuilder())
     ->configureHandlers(static function (HandlerRegistry $handlerRegistry): void {
         $handlerRegistry->registerSubscribingHandler(new TypedCollectionSerializationHandler());
         $handlerRegistry->registerSubscribingHandler(new TypedSetSerializationHandler());
+        $handlerRegistry->registerSubscribingHandler(new UnionSerializationHandler());
     })
     ->setObjectConstructor(new TypedCollectionObjectConstructorDecorator(new UnserializeObjectConstructor()))
     ->build();

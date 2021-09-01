@@ -24,6 +24,7 @@ use Jojo1981\TypedSet\Exception\SetException;
 use Jojo1981\TypedSet\Handler\Exception\HandlerException;
 use Jojo1981\TypedSet\Set;
 use PHPUnit\Framework\ExpectationFailedException;
+use RuntimeException;
 use SebastianBergmann\RecursionContext\InvalidArgumentException as SebastianBergmannInvalidArgumentException;
 use tests\Jojo1981\JmsSerializerHandlers\Fixtures\Set\Company;
 
@@ -124,10 +125,11 @@ final class TypedSetSerializationHandlerTest extends AbstractSerializationTest
      * @throws ExpectationFailedException
      * @throws HandlerException
      * @throws InvalidArgumentException
+     * @throws JmsSerializerInvalidArgumentException
      * @throws JmsSerializerLogicException
      * @throws JmsSerializerRuntimeException
-     * @throws JmsSerializerInvalidArgumentException
      * @throws NotAcceptableException
+     * @throws RuntimeException
      * @throws SebastianBergmannInvalidArgumentException
      * @throws SetException
      * @throws UnsupportedFormatException
@@ -149,10 +151,11 @@ final class TypedSetSerializationHandlerTest extends AbstractSerializationTest
      * @throws ExpectationFailedException
      * @throws HandlerException
      * @throws InvalidArgumentException
+     * @throws JmsSerializerInvalidArgumentException
      * @throws JmsSerializerLogicException
      * @throws JmsSerializerRuntimeException
-     * @throws JmsSerializerInvalidArgumentException
      * @throws NotAcceptableException
+     * @throws RuntimeException
      * @throws SebastianBergmannInvalidArgumentException
      * @throws SetException
      * @throws UnsupportedFormatException
@@ -174,10 +177,11 @@ final class TypedSetSerializationHandlerTest extends AbstractSerializationTest
      * @throws ExpectationFailedException
      * @throws HandlerException
      * @throws InvalidArgumentException
+     * @throws JmsSerializerInvalidArgumentException
      * @throws JmsSerializerLogicException
      * @throws JmsSerializerRuntimeException
-     * @throws JmsSerializerInvalidArgumentException
      * @throws NotAcceptableException
+     * @throws RuntimeException
      * @throws SebastianBergmannInvalidArgumentException
      * @throws SetException
      * @throws UnsupportedFormatException
@@ -199,10 +203,11 @@ final class TypedSetSerializationHandlerTest extends AbstractSerializationTest
      * @throws ExpectationFailedException
      * @throws HandlerException
      * @throws InvalidArgumentException
+     * @throws JmsSerializerInvalidArgumentException
      * @throws JmsSerializerLogicException
      * @throws JmsSerializerRuntimeException
-     * @throws JmsSerializerInvalidArgumentException
      * @throws NotAcceptableException
+     * @throws RuntimeException
      * @throws SebastianBergmannInvalidArgumentException
      * @throws SetException
      * @throws UnsupportedFormatException
@@ -224,10 +229,11 @@ final class TypedSetSerializationHandlerTest extends AbstractSerializationTest
      * @throws ExpectationFailedException
      * @throws HandlerException
      * @throws InvalidArgumentException
+     * @throws JmsSerializerInvalidArgumentException
      * @throws JmsSerializerLogicException
      * @throws JmsSerializerRuntimeException
-     * @throws JmsSerializerInvalidArgumentException
      * @throws NotAcceptableException
+     * @throws RuntimeException
      * @throws SebastianBergmannInvalidArgumentException
      * @throws SetException
      * @throws UnsupportedFormatException
@@ -249,10 +255,11 @@ final class TypedSetSerializationHandlerTest extends AbstractSerializationTest
      * @throws ExpectationFailedException
      * @throws HandlerException
      * @throws InvalidArgumentException
+     * @throws JmsSerializerInvalidArgumentException
      * @throws JmsSerializerLogicException
      * @throws JmsSerializerRuntimeException
-     * @throws JmsSerializerInvalidArgumentException
      * @throws NotAcceptableException
+     * @throws RuntimeException
      * @throws SebastianBergmannInvalidArgumentException
      * @throws SetException
      * @throws UnsupportedFormatException
@@ -291,16 +298,17 @@ final class TypedSetSerializationHandlerTest extends AbstractSerializationTest
      * @test
      *
      * @return void
+     * @throws AnnotationException
      * @throws HandlerException
+     * @throws InvalidArgumentException
+     * @throws JmsSerializerInvalidArgumentException
      * @throws JmsSerializerLogicException
      * @throws JmsSerializerRuntimeException
      * @throws NotAcceptableException
+     * @throws RuntimeException
      * @throws SetException
      * @throws UnsupportedFormatException
      * @throws ValueExceptionInterface
-     * @throws AnnotationException
-     * @throws InvalidArgumentException
-     * @throws JmsSerializerInvalidArgumentException
      */
     public function serializeShouldConvertACompanyObjectIntoAYamlString(): void
     {
@@ -316,6 +324,7 @@ final class TypedSetSerializationHandlerTest extends AbstractSerializationTest
      * @return Company
      * @throws SetException
      * @throws ValueExceptionInterface
+     * @throws RuntimeException
      * @throws HandlerException
      */
     private function getCompanyObject(): Company

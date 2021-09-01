@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<serializer>
+    <class name="tests\Jojo1981\JmsSerializerHandlers\Fixtures\Entity\Movie" access-type="property" exclusion-policy="ALL">
+        <property name="title" xml-attribute="true" type="string" expose="true" skip-when-empty="false"/>
+        <property name="rating" xml-attribute="true" type="float" expose="true" skip-when-empty="false"/>
+    </class>
+</serializer>
