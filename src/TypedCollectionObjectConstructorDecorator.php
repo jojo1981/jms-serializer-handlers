@@ -18,7 +18,6 @@ use Jojo1981\TypedCollection\Collection;
 use Jojo1981\TypedCollection\Exception\CollectionException;
 use ReflectionException;
 use ReflectionProperty;
-use RuntimeException;
 
 /**
  * @package Jojo1981\JmsSerializerHandlers
@@ -44,7 +43,6 @@ final class TypedCollectionObjectConstructorDecorator implements ObjectConstruct
      * @param DeserializationContext $context
      * @return object
      * @throws ReflectionException
-     * @throws RuntimeException
      * @throws CollectionException
      */
     public function construct(

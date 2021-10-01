@@ -20,7 +20,6 @@ use Jojo1981\PhpTypes\AbstractType;
 use Jojo1981\PhpTypes\Exception\TypeException;
 use Jojo1981\TypedCollection\Collection;
 use Jojo1981\TypedCollection\Exception\CollectionException;
-use RuntimeException;
 use function count;
 
 /**
@@ -81,9 +80,8 @@ class TypedCollectionSerializationHandler implements SubscribingHandlerInterface
      * @param mixed $data
      * @param array $type
      * @return Collection
-     * @throws CollectionException
-     * @throws RuntimeException
      * @throws SerializationHandlerException
+     * @throws CollectionException
      */
     public function deserializeCollection(DeserializationVisitorInterface $visitor, $data, array $type): Collection
     {

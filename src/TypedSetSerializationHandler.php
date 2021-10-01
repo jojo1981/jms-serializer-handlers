@@ -21,7 +21,6 @@ use Jojo1981\PhpTypes\Exception\TypeException;
 use Jojo1981\TypedSet\Exception\SetException;
 use Jojo1981\TypedSet\Handler\Exception\HandlerException;
 use Jojo1981\TypedSet\Set;
-use RuntimeException;
 use function count;
 
 /**
@@ -78,10 +77,9 @@ class TypedSetSerializationHandler implements SubscribingHandlerInterface
      * @param mixed $data
      * @param array $type
      * @return Set
+     * @throws SerializationHandlerException
      * @throws SetException
      * @throws HandlerException
-     * @throws RuntimeException
-     * @throws SerializationHandlerException
      */
     public function deserializeSet(DeserializationVisitorInterface $visitor, $data, array $type): Set
     {
