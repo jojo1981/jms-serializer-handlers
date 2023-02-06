@@ -87,7 +87,7 @@ final class UnionSerializationHandler implements SubscribingHandlerInterface
      * @throws NotAcceptableException
      * @noinspection PhpUnusedParameterInspection
      */
-    public function deserializeUnion(DeserializationVisitorInterface $visitor, array $data, array $type, DeserializationContext $context)
+    public function deserializeUnion(DeserializationVisitorInterface $visitor, array $data, array $type, DeserializationContext $context): mixed
     {
         if (!array_key_exists('__typename', $data)) {
             throw SerializationHandlerException::deserializeTypeNameMissingInData(self::class);

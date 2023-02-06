@@ -31,7 +31,7 @@ abstract class AbstractValueSerializationHandler implements SubscribingHandlerIn
      * @param ValueInterface $valueObject
      * @return int|float|string|DomText
      */
-    final public function serializeValue(SerializationVisitorInterface $visitor, ValueInterface $valueObject)
+    final public function serializeValue(SerializationVisitorInterface $visitor, ValueInterface $valueObject): DOMText|float|int|string
     {
         if ($visitor instanceof XmlSerializationVisitor) {
             return $visitor->getDocument()->createTextNode((string) $valueObject->getValue());

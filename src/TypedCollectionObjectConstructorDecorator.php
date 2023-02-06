@@ -41,7 +41,7 @@ final class TypedCollectionObjectConstructorDecorator implements ObjectConstruct
      * @param mixed $data
      * @param array $type
      * @param DeserializationContext $context
-     * @return object
+     * @return object|null
      * @throws ReflectionException
      * @throws CollectionException
      */

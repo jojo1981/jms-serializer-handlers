@@ -83,7 +83,7 @@ class TypedCollectionSerializationHandler implements SubscribingHandlerInterface
      * @throws SerializationHandlerException
      * @throws CollectionException
      */
-    public function deserializeCollection(DeserializationVisitorInterface $visitor, $data, array $type): Collection
+    public function deserializeCollection(DeserializationVisitorInterface $visitor, mixed $data, array $type): Collection
     {
         $collectionType = $type['params'][0]['name'] ?? null;
         if (empty($collectionType)) {

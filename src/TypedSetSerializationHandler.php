@@ -81,7 +81,7 @@ class TypedSetSerializationHandler implements SubscribingHandlerInterface
      * @throws SetException
      * @throws HandlerException
      */
-    public function deserializeSet(DeserializationVisitorInterface $visitor, $data, array $type): Set
+    public function deserializeSet(DeserializationVisitorInterface $visitor, mixed $data, array $type): Set
     {
         $collectionType = $type['params'][0]['name'] ?? null;
         if (empty($collectionType)) {

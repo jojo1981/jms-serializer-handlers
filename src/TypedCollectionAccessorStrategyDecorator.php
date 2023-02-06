@@ -38,7 +38,7 @@ final class TypedCollectionAccessorStrategyDecorator implements AccessorStrategy
      * @param SerializationContext $context
      * @return mixed
      */
-    public function getValue(object $object, PropertyMetadata $metadata, SerializationContext $context)
+    public function getValue(object $object, PropertyMetadata $metadata, SerializationContext $context): mixed
     {
         return $this->accessorStrategy->getValue($object, $metadata, $context);
     }
