@@ -47,7 +47,7 @@ abstract class AbstractValueSerializationHandler implements SubscribingHandlerIn
      * @return ValueInterface
      * @throws SerializationHandlerException
      */
-    public function deserializeValue(DeserializationVisitorInterface $visitor, $data, array $type): ValueInterface
+    public function deserializeValue(DeserializationVisitorInterface $visitor, mixed $data, array $type): ValueInterface
     {
         $this->assertType($type);
         if (null !== $innerType = $type['params'][0]['name'] ?? null) {

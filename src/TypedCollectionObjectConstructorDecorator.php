@@ -12,7 +12,6 @@ namespace Jojo1981\JmsSerializerHandlers;
 use JMS\Serializer\Construction\ObjectConstructorInterface;
 use JMS\Serializer\DeserializationContext;
 use JMS\Serializer\Metadata\ClassMetadata;
-use JMS\Serializer\Metadata\PropertyMetadata;
 use JMS\Serializer\Visitor\DeserializationVisitorInterface;
 use Jojo1981\TypedCollection\Collection;
 use Jojo1981\TypedCollection\Exception\CollectionException;
@@ -53,7 +52,6 @@ final class TypedCollectionObjectConstructorDecorator implements ObjectConstruct
         DeserializationContext $context
     ): ?object {
         $object = $this->objectConstructor->construct($visitor, $metadata, $data, $type, $context);
-        /** @var PropertyMetadata $property */
         foreach ($metadata->propertyMetadata as $property) {
             if (null === $property->type) {
                 continue;
@@ -68,7 +66,6 @@ final class TypedCollectionObjectConstructorDecorator implements ObjectConstruct
             } elseif ('array' === $property->type['name']) {
                 $reflectionProperty->setValue($object, []);
             } elseif ($property->skipWhenEmpty && (null !== $reflectionType = $reflectionProperty->getType()) && $reflectionType->allowsNull()) {
-                /** @noinspection PhpRedundantOptionalArgumentInspection */
                 $reflectionProperty->setValue($object, null);
             }
         }
