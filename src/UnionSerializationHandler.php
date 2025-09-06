@@ -58,13 +58,13 @@ final class UnionSerializationHandler implements SubscribingHandlerInterface
      * @param object $union
      * @param array $type
      * @param SerializationContext $context
-     * @return array|null
+     * @return array
      * @throws NotAcceptableException
      * @throws SerializationHandlerException
      * @throws JmsSerializerRuntimeException
      * @noinspection PhpUnusedParameterInspection
      */
-    public function serializeUnion(SerializationVisitorInterface $visitor, object $union, array $type, SerializationContext $context): ?array
+    public function serializeUnion(SerializationVisitorInterface $visitor, object $union, array $type, SerializationContext $context): array
     {
         $className = get_class($union);
         $this->assertClassNameIsValid($className, $type['params']);
