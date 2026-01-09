@@ -22,11 +22,11 @@
   "prefer-stable": true,
   "minimum-stability": "dev",
   "require": {
-    "php": "^8.0|^8.1|^8.2|^8.3|^8.4",
+    "php": "^8.0",
     "ext-dom": "*",
     "jms/serializer": "^3.0",
     "jojo1981/typed-collection": "^5.0",
-    "jojo1981/typed-set": "^5.0"
+    "jojo1981/typed-set": "^6.0"
   },
   "require-dev": {
     "dg/bypass-finals": "^1.3",
