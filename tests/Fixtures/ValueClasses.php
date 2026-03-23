@@ -10,6 +10,7 @@
 namespace tests\Jojo1981\JmsSerializerHandlers\Fixtures;
 
 use tests\Jojo1981\JmsSerializerHandlers\Fixtures\Value\Age;
+use tests\Jojo1981\JmsSerializerHandlers\Fixtures\Value\Operator;
 
 /**
  * @package tests\Jojo1981\JmsSerializerHandlers\Fixtures
@@ -17,8 +18,9 @@ use tests\Jojo1981\JmsSerializerHandlers\Fixtures\Value\Age;
 final class ValueClasses
 {
     /** @var string[] */
-    public const VALUES = [
-        Age::class
+    public const array VALUES = [
+        Age::class,
+        Operator::class
     ];
 
     /**

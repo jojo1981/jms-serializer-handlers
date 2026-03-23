@@ -1,26 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.5/phpunit.xsd"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/12/phpunit.xsd"
          colors="true"
-         bootstrap="tests/bootstrap.php"
 >
-  <php>
-    <env name="XDEBUG_MODE" value="coverage"/>
-  </php>
+    <php>
+        <env name="XDEBUG_MODE" value="coverage"/>
+    </php>
 
-  <testsuites>
-    <testsuite name="JMS Serializer Handlers - Test Suite">
-      <directory>./tests</directory>
-    </testsuite>
-  </testsuites>
+    <extensions>
+        <bootstrap class="DG\BypassFinals\PHPUnitExtension"/>
+    </extensions>
 
-  <coverage cacheDirectory="var/cache">
-    <include>
-      <directory suffix=".php">./src</directory>
-    </include>
-    <report>
-      <clover outputFile="build/reports/clover.xml"/>
-    </report>
-  </coverage>
+    <testsuites>
+        <testsuite name="JMS Serializer Handlers - Test Suite">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+
+    <source>
+        <include>
+            <directory>src</directory>
+        </include>
+    </source>
+
+    <coverage>
+        <report>
+            <clover outputFile="build/reports/clover.xml"/>
+        </report>
+    </coverage>
+
+    <logging>
+        <teamcity outputFile="build/reports/teamcity-report.txt"/>
+        <testdoxHtml outputFile="build/reports/html-report.html"/>
+        <testdoxText outputFile="build/reports/dox-report.txt"/>
+    </logging>
 
 </phpunit>

@@ -14,6 +14,8 @@ More information about JMS Serializer Handlers can be found [here](https://jmsys
 
 This library adds support for:
 - instances of `Jojo1981\TypedCollection\Collection` from the package `jojo1981/typed-collection`.
+- instances of `Jojo1981\TypedSet\Set` from the package `jojo1981/typed-set`.
+- union types
 
 ## Installation
 

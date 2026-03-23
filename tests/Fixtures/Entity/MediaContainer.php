@@ -15,12 +15,12 @@ namespace tests\Jojo1981\JmsSerializerHandlers\Fixtures\Entity;
 final class MediaContainer
 {
     /** @var Book|Movie */
-    private $media;
+    private Book|Movie $media;
 
     /**
      * @param Book|Movie $media
      */
-    public function __construct($media)
+    public function __construct(Movie|Book $media)
     {
         $this->media = $media;
     }
@@ -28,7 +28,7 @@ final class MediaContainer
     /**
      * @return Book|Movie
      */
-    public function getMedia()
+    public function getMedia(): Movie|Book
     {
         return $this->media;
     }

@@ -9,7 +9,7 @@
  */
 namespace tests\Jojo1981\JmsSerializerHandlers\Tests;
 
-use Doctrine\Common\Annotations\AnnotationException;
+use DateInvalidTimeZoneException;
 use InvalidArgumentException;
 use JMS\Serializer\Accessor\DefaultAccessorStrategy;
 use JMS\Serializer\Construction\UnserializeObjectConstructor;
@@ -28,7 +28,6 @@ use Jojo1981\TypedCollection\Exception\CollectionException;
 use Jojo1981\TypedSet\Exception\SetException;
 use Jojo1981\TypedSet\Handler\Exception\HandlerException;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 use tests\Jojo1981\JmsSerializerHandlers\Fixtures\Collection\Company as CollectionCompany;
 use tests\Jojo1981\JmsSerializerHandlers\Fixtures\Entity\Employee;
 use tests\Jojo1981\JmsSerializerHandlers\Fixtures\Serialization\ValueSerializationHandler;
@@ -38,18 +37,18 @@ use tests\Jojo1981\JmsSerializerHandlers\Fixtures\Value\Age;
 /**
  * @package tests\Jojo1981\JmsSerializerHandlers\Tests
  */
-abstract class AbstractSerializationTest extends TestCase
+abstract class AbstractSerializationTestCase extends TestCase
 {
     /** @var Serializer|null */
     private ?Serializer $serializer = null;
 
     /**
      * @return Serializer
-     * @throws InvalidArgumentException
      * @throws JmsInvalidArgumentException
      * @throws JmsLogicException
      * @throws JmsRuntimeException
-     * @throws AnnotationException
+     * @throws DateInvalidTimeZoneException
+     * @throws InvalidArgumentException
      */
     final protected function getSerializer(): Serializer
     {
@@ -86,12 +85,11 @@ abstract class AbstractSerializationTest extends TestCase
     /**
      * @param bool $withEmployees
      * @return SetCompany
-     * @throws RuntimeException
      * @throws SetException
      * @throws ValueExceptionInterface
      * @throws HandlerException
      */
-    final protected function getSetCompanyObject(bool $withEmployees): SetCompany
+    final static protected function getSetCompanyObject(bool $withEmployees): SetCompany
     {
         $companyObject = new SetCompany('Apple Computer, Inc.');
         if ($withEmployees) {
@@ -108,10 +106,9 @@ abstract class AbstractSerializationTest extends TestCase
      * @param bool $withEmployees
      * @return CollectionCompany
      * @throws ValueExceptionInterface
-     * @throws RuntimeException
      * @throws CollectionException
      */
-    final protected function getCollectionCompanyObject(bool $withEmployees): CollectionCompany
+    final static protected function getCollectionCompanyObject(bool $withEmployees): CollectionCompany
     {
         $companyObject = new CollectionCompany('Apple Computer, Inc.');
         if ($withEmployees) {
@@ -127,7 +124,7 @@ abstract class AbstractSerializationTest extends TestCase
     /**
      * @return array[]
      */
-    final protected function getCompanyArray(): array
+    final static protected function getCompanyArray(): array
     {
         return [
             'name' => 'Apple Computer, Inc.',
@@ -141,7 +138,7 @@ abstract class AbstractSerializationTest extends TestCase
     /**
      * @return string
      */
-    final protected function getJsonString(): string
+    final static protected function getJsonString(): string
     {
         return '{"name":"Apple Computer, Inc.","employees":[{"name":"Joost Nijhuis","age":40},{"name":"John Doe","age":25}]}';
     }
@@ -149,7 +146,7 @@ abstract class AbstractSerializationTest extends TestCase
     /**
      * @return string
      */
-    final protected function getXmlString(): string
+    final static protected function getXmlString(): string
     {
         return <<<XML
 <?xml version="1.0" encoding="UTF-8"?>
@@ -166,7 +163,7 @@ XML;
     /**
      * @return string
      */
-    final protected function getYamlString(): string
+    final static protected function getYamlString(): string
     {
         return <<<YAML
 name: 'Apple Computer, Inc.'
@@ -184,7 +181,7 @@ YAML;
     /**
      * @return string
      */
-    final protected function getJsonStringWithMissingEmployees(): string
+    final static protected function getJsonStringWithMissingEmployees(): string
     {
         return '{"name":"Apple Computer, Inc."}';
     }
@@ -192,7 +189,7 @@ YAML;
     /**
      * @return string
      */
-    final protected function getJsonStringWithEmployeesAsNullValue(): string
+    final static protected function getJsonStringWithEmployeesAsNullValue(): string
     {
         return '{"name":"Apple Computer, Inc.","employees": null}';
     }

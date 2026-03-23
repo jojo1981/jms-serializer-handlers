@@ -11,7 +11,6 @@ namespace tests\Jojo1981\JmsSerializerHandlers\Fixtures\Collection;
 
 use Jojo1981\TypedCollection\Collection;
 use Jojo1981\TypedCollection\Exception\CollectionException;
-use RuntimeException;
 use tests\Jojo1981\JmsSerializerHandlers\Fixtures\Entity\Employee;
 
 /**
@@ -22,13 +21,12 @@ class Company
     /** @var string */
     private string $name;
 
-    /** @var Collection|Employee[] */
+    /** @var Collection<Employee> */
     private Collection $employees;
 
     /**
      * @param string $name
      * @throws CollectionException
-     * @throws RuntimeException
      */
     public function __construct(string $name)
     {
@@ -45,7 +43,7 @@ class Company
     }
 
     /**
-     * @return Collection|Employee[]
+     * @return Collection<Employee>
      */
     public function getEmployees(): Collection
     {
