@@ -58,8 +58,6 @@ final class TypedCollectionObjectConstructorDecorator implements ObjectConstruct
             }
 
             $reflectionProperty = new ReflectionProperty($property->class, $property->name);
-            $reflectionProperty->setAccessible(true);
-
             if (Collection::class === $property->type['name']) {
                 $innerType = $property->type['params'][0]['name'];
                 $reflectionProperty->setValue($object, new Collection($innerType));

@@ -9,30 +9,38 @@
  */
 namespace tests\Jojo1981\JmsSerializerHandlers\Tests;
 
-use Doctrine\Common\Annotations\AnnotationException;
+use DateInvalidTimeZoneException;
 use InvalidArgumentException;
+use JMS\Serializer\Context;
 use JMS\Serializer\DeserializationContext;
 use JMS\Serializer\Exception\InvalidArgumentException as JmsSerializerInvalidArgumentException;
 use JMS\Serializer\Exception\LogicException;
 use JMS\Serializer\Exception\NotAcceptableException;
 use JMS\Serializer\Exception\RuntimeException;
 use JMS\Serializer\Exception\UnsupportedFormatException;
+use JMS\Serializer\GraphNavigatorInterface;
 use JMS\Serializer\Handler\HandlerRegistryInterface;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\Visitor\DeserializationVisitorInterface;
 use JMS\Serializer\Visitor\SerializationVisitorInterface;
+use JMS\Serializer\VisitorInterface;
 use Jojo1981\Contracts\Exception\ValueExceptionInterface;
 use Jojo1981\JmsSerializerHandlers\Exception\SerializationHandlerException;
 use Jojo1981\JmsSerializerHandlers\TypedCollectionSerializationHandler;
 use Jojo1981\JmsSerializerHandlers\TypedSetSerializationHandler;
 use Jojo1981\JmsSerializerHandlers\UnionSerializationHandler;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Exception as PHPUnitException;
 use PHPUnit\Framework\ExpectationFailedException;
 use Prophecy\Exception\Doubler\DoubleException;
 use Prophecy\Exception\Doubler\InterfaceNotFoundException;
+use Prophecy\Exception\InvalidArgumentException as ProphecyInvalidArgumentException;
+use Prophecy\Exception\Prophecy\MethodProphecyException;
 use Prophecy\Exception\Prophecy\ObjectProphecyException;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
-use SebastianBergmann\RecursionContext\InvalidArgumentException as SebastianBergmannInvalidArgumentException;
+use ReflectionClass;
+use ReflectionException;
 use tests\Jojo1981\JmsSerializerHandlers\Fixtures\Entity\Author;
 use tests\Jojo1981\JmsSerializerHandlers\Fixtures\Entity\Book;
 use tests\Jojo1981\JmsSerializerHandlers\Fixtures\Entity\Employee;
@@ -43,7 +51,7 @@ use tests\Jojo1981\JmsSerializerHandlers\Fixtures\Value\Age;
 /**
  * @package tests\Jojo1981\JmsSerializerHandlers\Tests
  */
-final class UnionSerializerHandlerTest extends AbstractSerializationTest
+final class UnionSerializerHandlerTest extends AbstractSerializationTestCase
 {
     use ProphecyTrait;
 
@@ -59,13 +67,10 @@ final class UnionSerializerHandlerTest extends AbstractSerializationTest
     }
 
     /**
-     * @test
-     *
      * @return void
      * @throws ExpectationFailedException
-     * @throws SebastianBergmannInvalidArgumentException
      */
-    public function getSubscribingMethodsShouldReturnTheRightSubscribingConfiguration(): void
+    public function testGetSubscribingMethodsShouldReturnTheRightSubscribingConfiguration(): void
     {
         $expectedResult = [
             ['direction' => 1, 'format' => 'json', 'type' => 'union', 'method' => 'serializeUnion'],
@@ -138,7 +143,7 @@ final class UnionSerializerHandlerTest extends AbstractSerializationTest
      * @throws NotAcceptableException
      * @throws RuntimeException
      * @throws UnsupportedFormatException
-     * @throws AnnotationException
+     * @throws DateInvalidTimeZoneException
      */
     public function testDeserializeWithInvalidDataMissingTypeName(): void
     {
@@ -154,7 +159,7 @@ final class UnionSerializerHandlerTest extends AbstractSerializationTest
      * @throws NotAcceptableException
      * @throws RuntimeException
      * @throws UnsupportedFormatException
-     * @throws AnnotationException
+     * @throws DateInvalidTimeZoneException
      */
     public function testDeserializeWithInvalidDataUseInvalidDataForConfiguredTypeNameForUnionType(): void
     {
@@ -169,44 +174,110 @@ final class UnionSerializerHandlerTest extends AbstractSerializationTest
     }
 
     /**
-     * @dataProvider getSuccessFullyTestData
-     *
      * @param string $jsonString
      * @param string $type
      * @param mixed $expectedResult
      * @return void
-     * @throws AnnotationException
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
      * @throws JmsSerializerInvalidArgumentException
      * @throws LogicException
      * @throws NotAcceptableException
      * @throws RuntimeException
-     * @throws SebastianBergmannInvalidArgumentException
      * @throws UnsupportedFormatException
+     * @throws DateInvalidTimeZoneException
      */
-    public function testSuccessFully(string $jsonString, string $type, $expectedResult): void
+    #[DataProvider('getSuccessFullyTestData')]
+    public function testSuccessFully(string $jsonString, string $type, mixed $expectedResult): void
     {
         self::assertEquals($expectedResult, $this->getSerializer()->deserialize($jsonString, $type, 'json'));
+    }
+
+    /**
+     * @return void
+     * @throws DoubleException
+     * @throws ExpectationFailedException
+     * @throws InterfaceNotFoundException
+     * @throws NotAcceptableException
+     * @throws ObjectProphecyException
+     * @throws RuntimeException
+     * @throws SerializationHandlerException
+     * @throws PHPUnitException
+     * @throws ProphecyInvalidArgumentException
+     * @throws MethodProphecyException
+     */
+    public function testSerializeUnionReturnsMergedResultWithTypename(): void
+    {
+        $union = new Book('Design patterns', new Author('John Doe'));
+        $params = [
+            ['name' => Book::class, 'params' => []],
+            ['name' => Movie::class, 'params' => []]
+        ];
+        $type = ['name' => 'union', 'params' => $params];
+
+        // Use Prophecy for visitor and context
+        $visitorProphecy = $this->prophesize(SerializationVisitorInterface::class);
+        $visitor = $visitorProphecy->reveal();
+        $contextProphecy = $this->prophesize(SerializationContext::class);
+        $contextProphecy->stopVisiting($union)->shouldBeCalled();
+        $contextProphecy->startVisiting($union)->shouldBeCalled();
+
+        // Real GraphNavigatorInterface stub
+        $navigator = new class implements GraphNavigatorInterface {
+            public function accept(mixed $data, array|null $type = null, Context $context = null): array
+            {
+                return ['title' => $data->getTitle(), 'author' => ['name' => $data->getAuthor()->getName()]];
+            }
+
+            public function initialize(VisitorInterface $visitor, Context $context): void
+            {
+            }
+        };
+        $contextProphecy->getNavigator()->willReturn($navigator);
+        $context = $contextProphecy->reveal();
+
+        $handler = new UnionSerializationHandler();
+        $result = $handler->serializeUnion($visitor, $union, $type, $context);
+        self::assertArrayHasKey('__typename', $result);
+        self::assertSame(Book::class, $result['__typename']);
+        self::assertSame('Design patterns', $result['title']);
+        self::assertEquals(['name' => 'John Doe'], $result['author']);
+    }
+
+    /**
+     * @return void
+     * @throws ReflectionException
+     * @throws ExpectationFailedException
+     */
+    public function testGetNewTypeFromParamsReturnsEmptyArrayIfClassNameNotFound(): void
+    {
+        $handler = new ReflectionClass(UnionSerializationHandler::class);
+        $method = $handler->getMethod('getNewTypeFromParams');
+        $params = [
+            ['name' => Book::class, 'params' => []],
+            ['name' => Movie::class, 'params' => []]
+        ];
+        $result = $method->invoke(new UnionSerializationHandler(), 'NonExistentClass', $params);
+        self::assertSame([], $result);
     }
 
     /**
      * @return array[]
      * @throws ValueExceptionInterface
      */
-    public function getSuccessFullyTestData(): array
+    public static function getSuccessFullyTestData(): array
     {
         return [
-            [$this->getTestJsonString0(), Employee::class, $this->getExpectedResult0()],
-            [$this->getTestJsonString1(), MediaContainer::class, $this->getExpectedResult1()],
-            [$this->getTestJsonString2(), MediaContainer::class, $this->getExpectedResult2()]
+            [self::getTestJsonString0(), Employee::class, self::getExpectedResult0()],
+            [self::getTestJsonString1(), MediaContainer::class, self::getExpectedResult1()],
+            [self::getTestJsonString2(), MediaContainer::class, self::getExpectedResult2()]
         ];
     }
 
     /**
-     * @return void
+     * @return string
      */
-    private function getTestJsonString0(): string
+    private static function getTestJsonString0(): string
     {
         return <<<JSON
 {
@@ -234,7 +305,7 @@ JSON;
      * @return Employee
      * @throws ValueExceptionInterface
      */
-    private function getExpectedResult0(): Employee
+    private static function getExpectedResult0(): Employee
     {
         return new Employee(
             'Jane Doe',
@@ -247,9 +318,9 @@ JSON;
     }
 
     /**
-     * @return void
+     * @return string
      */
-    private function getTestJsonString1(): string
+    private static function getTestJsonString1(): string
     {
         return <<<JSON
 {
@@ -267,15 +338,15 @@ JSON;
     /**
      * @return MediaContainer
      */
-    private function getExpectedResult1(): MediaContainer
+    private static function getExpectedResult1(): MediaContainer
     {
         return new MediaContainer(new Book('Design patterns', new Author('John Doe')));
     }
 
     /**
-     * @return void
+     * @return string
      */
-    private function getTestJsonString2(): string
+    private static function getTestJsonString2(): string
     {
         return <<<JSON
 {
@@ -288,7 +359,10 @@ JSON;
 JSON;
     }
 
-    private function getExpectedResult2(): MediaContainer
+    /**
+     * @return MediaContainer
+     */
+    private static function getExpectedResult2(): MediaContainer
     {
         return new MediaContainer(new Movie('The matrix', 8.7));
     }

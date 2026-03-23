@@ -13,7 +13,6 @@ use Jojo1981\Contracts\HashableInterface;
 use Jojo1981\TypedSet\Exception\SetException;
 use Jojo1981\TypedSet\Handler\Exception\HandlerException;
 use Jojo1981\TypedSet\Set;
-use RuntimeException;
 use tests\Jojo1981\JmsSerializerHandlers\Fixtures\Entity\Employee;
 use function hash;
 
@@ -25,14 +24,13 @@ class Company implements HashableInterface
     /** @var string */
     private string $name;
 
-    /** @var Set|Employee[] */
+    /** @var Set<Employee> */
     private Set $employees;
 
     /**
      * @param string $name
-     * @throws SetException
      * @throws HandlerException
-     * @throws RuntimeException
+     * @throws SetException
      */
     public function __construct(string $name)
     {
@@ -49,7 +47,7 @@ class Company implements HashableInterface
     }
 
     /**
-     * @return Set|Employee[]
+     * @return Set<Employee>
      */
     public function getEmployees(): Set
     {
